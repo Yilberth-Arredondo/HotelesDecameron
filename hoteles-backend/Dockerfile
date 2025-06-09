@@ -70,4 +70,4 @@ RUN chmod +x /start.sh
 EXPOSE 8080
 
 # Comando de inicio
-CMD ["/debug.sh"]
+CMD ["/start.sh"]
