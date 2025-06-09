@@ -46,7 +46,6 @@ max_attempts=30
 until PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USERNAME" -d "$DB_DATABASE" -c '\q' 2>/dev/null; do
     attempts=$((attempts + 1))
     if [ $attempts -eq $max_attempts ]; then
-        echo "❌ No se pudo conectar a PostgreSQL después de $max_attempts intentos"
         exit 1
     fi
     echo "PostgreSQL no está listo - intento $attempts/$max_attempts"
@@ -55,7 +54,7 @@ done
 
 echo "✅ PostgreSQL está listo!"
 
-# Antes de ejecutar migraciones
+# Configurar migraciones y seeders
 echo "🔧 Configurando nombre de tabla de migraciones..."
 export MIGRATIONS_TABLE="migrations"
 php artisan config:clear
@@ -72,20 +71,14 @@ php artisan db:seed --force
 
 # Verificar si hay datos
 echo "📊 Verificando datos..."
-HOTEL_COUNT=$(php artisan tinker --execute="echo \App\Models\Hotel::count();" 2>/dev/null | tail -1)
-
-if [ "$HOTEL_COUNT" = "0" ] || [ -z "$HOTEL_COUNT" ]; then
-    echo "🌱 Base de datos vacía, ejecutando seeders..."
-    php artisan db:seed --force || echo "⚠️ Seeders no ejecutados"
-else
-    echo "✅ Base de datos contiene $HOTEL_COUNT hoteles"
-fi
+php artisan tinker --execute="echo \App\Models\Hotel::count();" || echo "0"
 
 # Limpiar y optimizar caché
 echo "🧹 Optimizando aplicación..."
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear
+
 # Configurar supervisor
 mkdir -p /etc/supervisor/conf.d
 cat > /etc/supervisor/conf.d/laravel.conf << EOF
