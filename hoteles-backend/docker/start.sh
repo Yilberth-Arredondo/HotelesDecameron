@@ -3,8 +3,8 @@ set -e
 
 echo "🚀 Iniciando aplicación Laravel en Railway..."
 
-# Railway siempre proporciona PORT, pero por si acaso
-PORT=${PORT:-8000}
+# Railway siempre proporciona PORT
+PORT=${PORT:-8080}
 echo "📍 Puerto asignado por Railway: $PORT"
 
 # Configurar PHP-FPM
@@ -26,78 +26,8 @@ EOF
 
 # Configurar Nginx para usar el puerto de Railway
 echo "🔧 Configurando Nginx para puerto $PORT..."
-cat > /etc/nginx/sites-enabled/default << EOF
-server {
-    listen $PORT default_server;
-    listen [::]:$PORT default_server;
-    
-    root /app/public;
-    index index.php index.html;
-    
-    server_name _;
-    
-    # Logs
-    access_log /dev/stdout;
-    error_log /dev/stderr;
-    
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
-    
-    location ~ \.php$ {
-        try_files \$uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_index index.php;
-        include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        fastcgi_param PATH_INFO \$fastcgi_path_info;
-        fastcgi_read_timeout 300;
-    }
-    
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-}
-EOF
-
-# Eliminar default de sites-available si existe
-rm -f /etc/nginx/sites-enabled/default
-rm -f /etc/nginx/sites-available/default
-
-# Configuración principal de Nginx
-cat > /etc/nginx/nginx.conf << EOF
-user www-data;
-worker_processes auto;
-pid /run/nginx.pid;
-error_log /dev/stderr;
-
-events {
-    worker_connections 1024;
-}
-
-http {
-    access_log /dev/stdout;
-    
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
-    types_hash_max_size 2048;
-    client_max_body_size 100M;
-    
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-    
-    gzip on;
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_comp_level 6;
-    gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/rss+xml application/atom+xml image/svg+xml;
-    
-    include /etc/nginx/sites-enabled/*;
-}
-EOF
+sed -i "s/listen 8080 default_server;/listen $PORT default_server;/g" /etc/nginx/sites-available/default
+sed -i "s/listen \[::\]:8080 default_server;/listen \[::\]:$PORT default_server;/g" /etc/nginx/sites-available/default
 
 # Verificar configuración de Nginx
 echo "🔍 Verificando configuración de Nginx..."
@@ -155,37 +85,31 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Crear archivo de configuración de supervisor
+# Configurar supervisor
 mkdir -p /etc/supervisor/conf.d
-cat > /etc/supervisor/supervisord.conf << EOF
-[supervisord]
-nodaemon=true
-logfile=/dev/stdout
-logfile_maxbytes=0
-pidfile=/var/run/supervisord.pid
-
+cat > /etc/supervisor/conf.d/laravel.conf << EOF
 [program:php-fpm]
-command=/usr/local/sbin/php-fpm -F
+command=php-fpm
 autostart=true
 autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
+stderr_logfile=/var/log/php-fpm.err.log
+stdout_logfile=/var/log/php-fpm.out.log
 
 [program:nginx]
-command=/usr/sbin/nginx -g 'daemon off;'
+command=nginx -g "daemon off;"
 autostart=true
 autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
+stderr_logfile=/var/log/nginx.err.log
+stdout_logfile=/var/log/nginx.out.log
 EOF
 
 echo "✅ Aplicación lista!"
 echo "🌐 Servidor escuchando en puerto $PORT"
 echo "📍 URL de la aplicación: $APP_URL"
+
+# Añadir este comando antes de exec supervisord para verificar
+echo "✅ Verificando si PHP-FPM puede ejecutar código PHP..."
+php -r "echo 'PHP funcionando';"
 
 # Iniciar supervisor
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
