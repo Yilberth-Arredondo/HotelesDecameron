@@ -125,10 +125,15 @@ done
 
 echo "✅ PostgreSQL está listo!"
 
-# Ejecutar migraciones
+# Antes de ejecutar migraciones
+echo "🔧 Configurando nombre de tabla de migraciones..."
+export MIGRATIONS_TABLE="migrations"
+php artisan config:clear
+
 echo "🔄 Ejecutando migraciones..."
-php artisan migrate --force || {
-    echo "❌ Error en migraciones. Verificando conexión..."
+php artisan migrate --force --verbose || {
+    echo "❌ Error en migraciones. Mostrando detalles:"
+    php artisan migrate:status
     php artisan db:show
     exit 1
 }
