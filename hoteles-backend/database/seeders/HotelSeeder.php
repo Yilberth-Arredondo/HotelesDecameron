@@ -55,7 +55,12 @@ class HotelSeeder extends Seeder
             // Agregar habitaciones según el hotel
             switch ($hotel->id) {
                 case 1:
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'SENCILLA', 'cantidad' => 25]);
+                    Habitacion::create([
+                        'hotel_id' => $hotel->id, 
+                        'tipo_habitacion' => 'ESTANDAR', // Cambiar 'tipo' por 'tipo_habitacion'
+                        'acomodacion' => 'SENCILLA', 
+                        'cantidad' => 25
+                    ]);
                     Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 12]);
                     Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 5]);
                     break;
