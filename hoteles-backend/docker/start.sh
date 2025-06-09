@@ -1,47 +1,55 @@
 #!/bin/bash
+set -e
 
-echo "=== DIAGNÓSTICO RAILWAY ==="
-echo "Fecha: $(date)"
+echo "🚀 Iniciando aplicación Laravel en Railway..."
+echo "⏰ $(date)"
+
+PORT=${PORT:-8080}
+echo "📍 Puerto: $PORT"
+
+cd /app
+
+# Permisos básicos
+echo "🔧 Configurando permisos..."
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
+chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+
+# Verificar conexión a DB
+echo "🔍 Verificando base de datos..."
+php artisan tinker --execute="try { \DB::select('SELECT 1'); echo '✅ Base de datos conectada'; } catch (\Exception \$e) { echo '❌ Error DB: ' . \$e->getMessage(); }" || true
 echo ""
 
-echo "=== VARIABLES DE ENTORNO ==="
-echo "PORT: ${PORT:-NO DEFINIDO}"
-echo "APP_URL: ${APP_URL:-NO DEFINIDO}"
-echo "DB_HOST: ${DB_HOST:-NO DEFINIDO}"
-echo "DB_CONNECTION: ${DB_CONNECTION:-NO DEFINIDO}"
+# Limpiar caché
+echo "🧹 Limpiando caché..."
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# Ejecutar migraciones
+echo "📦 Ejecutando migraciones..."
+php artisan migrate --force || echo "⚠️  Error en migraciones"
+
+# Ejecutar seeders
+echo "🌱 Ejecutando seeders..."
+php artisan db:seed --force || echo "⚠️  Error en seeders"
+
+# Cachear configuración
+echo "⚡ Optimizando..."
+php artisan config:cache
+php artisan route:cache
+
+# Mostrar información
+echo ""
+echo "✅ Aplicación lista!"
+echo "🌐 URL: $APP_URL"
+echo "📍 Puerto: $PORT"
+echo ""
+echo "📋 Endpoints disponibles:"
+echo "   - $APP_URL/api/health"
+echo "   - $APP_URL/api/hoteles"
+echo "   - $APP_URL/api/hoteles/{id}/habitaciones"
 echo ""
 
-echo "=== VERSIONES ==="
-php -v | head -1
-nginx -v 2>&1
-echo ""
-
-echo "=== ESTRUCTURA DE ARCHIVOS ==="
-echo "Contenido de /app:"
-ls -la /app/ | head -10
-echo ""
-echo "Contenido de /app/public:"
-ls -la /app/public/ | head -10
-echo ""
-
-echo "=== TEST DE PHP ==="
-php -r "echo 'PHP CLI funciona correctamente\n';"
-echo ""
-
-echo "=== TEST DE COMPOSER ==="
-cd /app && composer --version
-echo ""
-
-echo "=== TEST DE LARAVEL ==="
-cd /app && php artisan --version 2>&1 || echo "Error ejecutando artisan"
-echo ""
-
-echo "=== TEST DE BASE DE DATOS ==="
-cd /app && php artisan tinker --execute="try { \DB::select('SELECT 1'); echo 'DB OK'; } catch (\Exception \$e) { echo 'DB ERROR: ' . \$e->getMessage(); }" 2>&1 || echo "No se pudo probar DB"
-echo ""
-
-echo "=== CREANDO SERVIDOR DE PRUEBA ==="
-echo "<?php echo 'Servidor PHP funcionando en puerto ' . ($_SERVER['SERVER_PORT'] ?? 'desconocido');" > /tmp/test.php
-
-echo "Iniciando servidor PHP built-in en puerto ${PORT:-8080}..."
-cd /tmp && php -S 0.0.0.0:${PORT:-8080} test.php
+# Opción 1: Usar servidor de Laravel (más simple)
+echo "🚀 Iniciando servidor Laravel..."
+exec php artisan serve --host=0.0.0.0 --port=$PORT
