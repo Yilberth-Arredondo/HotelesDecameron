@@ -336,14 +336,3 @@ nvm use 18.19.0
 ```
 
 ---
-
-# 🎯 **Siguiente Paso**
-
-Una vez que tengas todo instalado y verificado, estarás listo para:
-
-1. **Crear el proyecto Laravel**
-2. **Configurar la base de datos**
-3. **Crear el proyecto React**
-4. **Comenzar el desarrollo**
-
-¿Ya tienes todo instalado o necesitas ayuda con algún paso específico?
