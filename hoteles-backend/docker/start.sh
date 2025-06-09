@@ -43,4 +43,16 @@ EOF
 # Iniciar los servicios
 mkdir -p /run/php
 php-fpm -D
-nginx -g "daemon off;"
+
+# Añadir al start.sh antes de iniciar Nginx
+echo "🔍 Verificando configuración de Nginx..."
+nginx -t
+
+# Si la configuración es correcta, iniciar Nginx
+if [ $? -eq 0 ]; then
+    echo "✅ Iniciando Nginx..."
+    nginx -g "daemon off;"
+else
+    echo "❌ Error en la configuración de Nginx"
+    exit 1
+fi
