@@ -52,35 +52,34 @@ class HotelSeeder extends Seeder
         foreach ($hoteles as $hotelData) {
             $hotel = Hotel::create($hotelData);
             
-            // Agregar habitaciones según el hotel
             switch ($hotel->id) {
                 case 1:
                     Habitacion::create([
                         'hotel_id' => $hotel->id, 
-                        'tipo_habitacion' => 'ESTANDAR', // Cambiar 'tipo' por 'tipo_habitacion'
+                        'tipo_habitacion' => 'ESTANDAR', 
                         'acomodacion' => 'SENCILLA', 
                         'cantidad' => 25
                     ]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 12]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 5]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 12]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 5]);
                     break;
                 case 2:
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'SENCILLA', 'cantidad' => 30]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 20]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'SUITE', 'acomodacion' => 'DOBLE', 'cantidad' => 10]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'ESTANDAR', 'acomodacion' => 'SENCILLA', 'cantidad' => 30]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 20]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'SUITE', 'acomodacion' => 'DOBLE', 'cantidad' => 10]);
                     break;
                 case 3:
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 15]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'JUNIOR', 'acomodacion' => 'CUADRUPLE', 'cantidad' => 15]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'SUITE', 'acomodacion' => 'TRIPLE', 'cantidad' => 5]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 15]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'JUNIOR', 'acomodacion' => 'CUADRUPLE', 'cantidad' => 15]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'SUITE', 'acomodacion' => 'TRIPLE', 'cantidad' => 5]);
                     break;
                 case 4:
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'SENCILLA', 'cantidad' => 20]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'SUITE', 'acomodacion' => 'SENCILLA', 'cantidad' => 8]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'ESTANDAR', 'acomodacion' => 'SENCILLA', 'cantidad' => 20]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'SUITE', 'acomodacion' => 'SENCILLA', 'cantidad' => 8]);
                     break;
                 case 5:
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 25]);
-                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 15]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'ESTANDAR', 'acomodacion' => 'DOBLE', 'cantidad' => 25]);
+                    Habitacion::create(['hotel_id' => $hotel->id, 'tipo_habitacion' => 'JUNIOR', 'acomodacion' => 'TRIPLE', 'cantidad' => 15]);
                     break;
             }
         }
