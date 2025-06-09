@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('habitacions', function (Blueprint $table) {
+        Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('hotel_id')->constrained('hotels')->onDelete('cascade');
             $table->enum('tipo_habitacion', ['ESTANDAR', 'JUNIOR', 'SUITE']);
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('habitacions');
+        Schema::dropIfExists('rooms');
     }
 };
 

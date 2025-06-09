@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS hotels (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS habitacions (
+CREATE TABLE IF NOT EXISTS rooms (
     id SERIAL PRIMARY KEY,
     hotel_id INTEGER NOT NULL REFERENCES hotels(id) ON DELETE CASCADE,
     tipo_habitacion VARCHAR(20) NOT NULL CHECK (tipo_habitacion IN ('ESTANDAR', 'JUNIOR', 'SUITE')),
@@ -80,7 +80,7 @@ INSERT INTO hotels (nombre, direccion, ciudad, nit, numero_max_habitaciones) VAL
 ('Decameron Los Cocos', 'Carrera 3 No. 8-60', 'Rincón del Mar', '99887766-3', 50)
 ON CONFLICT (nit) DO NOTHING;
 
-INSERT INTO habitacions (hotel_id, tipo_habitacion, acomodacion, cantidad) VALUES 
+INSERT INTO rooms (hotel_id, tipo_habitacion, acomodacion, cantidad) VALUES 
 (1, 'ESTANDAR', 'SENCILLA', 25),
 (1, 'JUNIOR', 'TRIPLE', 12),
 (1, 'ESTANDAR', 'DOBLE', 5),
@@ -106,7 +106,7 @@ fi
 # Verificar instalación
 echo "3. Verificando instalación..."
 HOTELS=$(sudo -u postgres psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM hotels;" 2>/dev/null | xargs)
-HABITACIONES=$(sudo -u postgres psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM habitacions;" 2>/dev/null | xargs)
+HABITACIONES=$(sudo -u postgres psql -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM rooms;" 2>/dev/null | xargs)
 
 if [[ "$HOTELS" -gt 0 ]] && [[ "$HABITACIONES" -gt 0 ]]; then
     echo "   ✅ Verificación exitosa"

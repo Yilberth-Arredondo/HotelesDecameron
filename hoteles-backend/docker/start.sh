@@ -60,13 +60,15 @@ echo "🔧 Configurando nombre de tabla de migraciones..."
 export MIGRATIONS_TABLE="migrations"
 php artisan config:clear
 
-echo "🔄 Ejecutando migraciones..."
-php artisan migrate --force --verbose || {
+echo "🔄 Ejecutando migraciones frescas..."
+php artisan migrate:fresh --force --verbose || {
     echo "❌ Error en migraciones. Mostrando detalles:"
     php artisan migrate:status
-    php artisan db:show
     exit 1
 }
+
+echo "🌱 Ejecutando seeders..."
+php artisan db:seed --force
 
 # Verificar si hay datos
 echo "📊 Verificando datos..."
@@ -81,10 +83,9 @@ fi
 
 # Limpiar y optimizar caché
 echo "🧹 Optimizando aplicación..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
 # Configurar supervisor
 mkdir -p /etc/supervisor/conf.d
 cat > /etc/supervisor/conf.d/laravel.conf << EOF

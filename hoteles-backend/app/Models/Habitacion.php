@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Habitacion extends Model
 {
     use HasFactory;
+    protected $table = 'rooms';
 
     protected $fillable = [
         'hotel_id',

@@ -55,10 +55,10 @@ ALTER SEQUENCE public.failed_jobs_id_seq OWNED BY public.failed_jobs.id;
 
 
 --
--- Name: habitacions; Type: TABLE; Schema: public; Owner: -
+-- Name: rooms; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.habitacions (
+CREATE TABLE public.rooms (
     id bigint NOT NULL,
     hotel_id bigint NOT NULL,
     tipo_habitacion character varying(255) NOT NULL,
@@ -66,16 +66,16 @@ CREATE TABLE public.habitacions (
     cantidad integer NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
-    CONSTRAINT habitacions_acomodacion_check CHECK (((acomodacion)::text = ANY (ARRAY[('SENCILLA'::character varying)::text, ('DOBLE'::character varying)::text, ('TRIPLE'::character varying)::text, ('CUADRUPLE'::character varying)::text]))),
-    CONSTRAINT habitacions_tipo_habitacion_check CHECK (((tipo_habitacion)::text = ANY (ARRAY[('ESTANDAR'::character varying)::text, ('JUNIOR'::character varying)::text, ('SUITE'::character varying)::text])))
+    CONSTRAINT rooms_acomodacion_check CHECK (((acomodacion)::text = ANY (ARRAY[('SENCILLA'::character varying)::text, ('DOBLE'::character varying)::text, ('TRIPLE'::character varying)::text, ('CUADRUPLE'::character varying)::text]))),
+    CONSTRAINT rooms_tipo_habitacion_check CHECK (((tipo_habitacion)::text = ANY (ARRAY[('ESTANDAR'::character varying)::text, ('JUNIOR'::character varying)::text, ('SUITE'::character varying)::text])))
 );
 
 
 --
--- Name: habitacions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: rooms_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.habitacions_id_seq
+CREATE SEQUENCE public.rooms_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -84,10 +84,10 @@ CREATE SEQUENCE public.habitacions_id_seq
 
 
 --
--- Name: habitacions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: rooms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.habitacions_id_seq OWNED BY public.habitacions.id;
+ALTER SEQUENCE public.rooms_id_seq OWNED BY public.rooms.id;
 
 
 --
@@ -247,10 +247,10 @@ ALTER TABLE ONLY public.failed_jobs ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: habitacions id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: rooms id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions ALTER COLUMN id SET DEFAULT nextval('public.habitacions_id_seq'::regclass);
+ALTER TABLE ONLY public.rooms ALTER COLUMN id SET DEFAULT nextval('public.rooms_id_seq'::regclass);
 
 
 --
@@ -298,11 +298,11 @@ ALTER TABLE ONLY public.failed_jobs
 
 
 --
--- Name: habitacions habitacions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rooms rooms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions
-    ADD CONSTRAINT habitacions_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.rooms
+    ADD CONSTRAINT rooms_pkey PRIMARY KEY (id);
 
 
 --
@@ -362,10 +362,10 @@ ALTER TABLE ONLY public.personal_access_tokens
 
 
 --
--- Name: habitacions unique_habitacion_config; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rooms unique_habitacion_config; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions
+ALTER TABLE ONLY public.rooms
     ADD CONSTRAINT unique_habitacion_config UNIQUE (hotel_id, tipo_habitacion, acomodacion);
 
 
@@ -407,11 +407,11 @@ CREATE INDEX personal_access_tokens_tokenable_type_tokenable_id_index ON public.
 
 
 --
--- Name: habitacions habitacions_hotel_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: rooms rooms_hotel_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions
-    ADD CONSTRAINT habitacions_hotel_id_foreign FOREIGN KEY (hotel_id) REFERENCES public.hotels(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.rooms
+    ADD CONSTRAINT rooms_hotel_id_foreign FOREIGN KEY (hotel_id) REFERENCES public.hotels(id) ON DELETE CASCADE;
 
 
 --

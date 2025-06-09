@@ -20,7 +20,7 @@ Route::get('/', function () {
         'documentation' => '/api/documentation',
         'endpoints' => [
             'hoteles' => '/api/hotels',
-            'habitaciones' => '/api/habitacions'
+            'habitaciones' => '/api/rooms'
         ]
     ];
 });

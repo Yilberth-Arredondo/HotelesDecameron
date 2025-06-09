@@ -30,12 +30,12 @@ INSERT INTO public.hotels (id, nombre, direccion, ciudad, nit, numero_max_habita
 
 
 --
--- Data for Name: habitacions; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: rooms; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (1, 1, 'ESTANDAR', 'SENCILLA', 25, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (2, 1, 'JUNIOR', 'TRIPLE', 12, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (3, 1, 'ESTANDAR', 'DOBLE', 5, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (1, 1, 'ESTANDAR', 'SENCILLA', 25, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (2, 1, 'JUNIOR', 'TRIPLE', 12, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (3, 1, 'ESTANDAR', 'DOBLE', 5, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
 
 
 --
@@ -47,7 +47,7 @@ INSERT INTO public.migrations (id, migration, batch) VALUES (2, '2014_10_12_1000
 INSERT INTO public.migrations (id, migration, batch) VALUES (3, '2019_08_19_000000_create_failed_jobs_table', 1);
 INSERT INTO public.migrations (id, migration, batch) VALUES (4, '2019_12_14_000001_create_personal_access_tokens_table', 1);
 INSERT INTO public.migrations (id, migration, batch) VALUES (5, '2025_06_08_163238_create_hotels_table', 2);
-INSERT INTO public.migrations (id, migration, batch) VALUES (6, '2025_06_08_163249_create_habitacions_table', 2);
+INSERT INTO public.migrations (id, migration, batch) VALUES (6, '2025_06_08_163249_create_rooms_table', 2);
 
 
 --
@@ -76,10 +76,10 @@ SELECT pg_catalog.setval('public.failed_jobs_id_seq', 1, false);
 
 
 --
--- Name: habitacions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.habitacions_id_seq', 3, true);
+SELECT pg_catalog.setval('public.rooms_id_seq', 3, true);
 
 
 --

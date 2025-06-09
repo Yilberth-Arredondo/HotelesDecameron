@@ -16,13 +16,13 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY public.habitacions DROP CONSTRAINT IF EXISTS habitacions_hotel_id_foreign;
+ALTER TABLE IF EXISTS ONLY public.rooms DROP CONSTRAINT IF EXISTS rooms_hotel_id_foreign;
 DROP INDEX IF EXISTS public.personal_access_tokens_tokenable_type_tokenable_id_index;
 DROP INDEX IF EXISTS public.hotels_nombre_index;
 DROP INDEX IF EXISTS public.hotels_ciudad_index;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pkey;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_email_unique;
-ALTER TABLE IF EXISTS ONLY public.habitacions DROP CONSTRAINT IF EXISTS unique_habitacion_config;
+ALTER TABLE IF EXISTS ONLY public.rooms DROP CONSTRAINT IF EXISTS unique_habitacion_config;
 ALTER TABLE IF EXISTS ONLY public.personal_access_tokens DROP CONSTRAINT IF EXISTS personal_access_tokens_token_unique;
 ALTER TABLE IF EXISTS ONLY public.personal_access_tokens DROP CONSTRAINT IF EXISTS personal_access_tokens_pkey;
 ALTER TABLE IF EXISTS ONLY public.password_reset_tokens DROP CONSTRAINT IF EXISTS password_reset_tokens_pkey;
@@ -30,14 +30,14 @@ ALTER TABLE IF EXISTS ONLY public.migrations DROP CONSTRAINT IF EXISTS migration
 ALTER TABLE IF EXISTS ONLY public.hotels DROP CONSTRAINT IF EXISTS hotels_pkey;
 ALTER TABLE IF EXISTS ONLY public.hotels DROP CONSTRAINT IF EXISTS hotels_nombre_unique;
 ALTER TABLE IF EXISTS ONLY public.hotels DROP CONSTRAINT IF EXISTS hotels_nit_unique;
-ALTER TABLE IF EXISTS ONLY public.habitacions DROP CONSTRAINT IF EXISTS habitacions_pkey;
+ALTER TABLE IF EXISTS ONLY public.rooms DROP CONSTRAINT IF EXISTS rooms_pkey;
 ALTER TABLE IF EXISTS ONLY public.failed_jobs DROP CONSTRAINT IF EXISTS failed_jobs_uuid_unique;
 ALTER TABLE IF EXISTS ONLY public.failed_jobs DROP CONSTRAINT IF EXISTS failed_jobs_pkey;
 ALTER TABLE IF EXISTS public.users ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.personal_access_tokens ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.migrations ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.hotels ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.habitacions ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.rooms ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.failed_jobs ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE IF EXISTS public.users_id_seq;
 DROP TABLE IF EXISTS public.users;
@@ -48,8 +48,8 @@ DROP SEQUENCE IF EXISTS public.migrations_id_seq;
 DROP TABLE IF EXISTS public.migrations;
 DROP SEQUENCE IF EXISTS public.hotels_id_seq;
 DROP TABLE IF EXISTS public.hotels;
-DROP SEQUENCE IF EXISTS public.habitacions_id_seq;
-DROP TABLE IF EXISTS public.habitacions;
+DROP SEQUENCE IF EXISTS public.rooms_id_seq;
+DROP TABLE IF EXISTS public.rooms;
 DROP SEQUENCE IF EXISTS public.failed_jobs_id_seq;
 DROP TABLE IF EXISTS public.failed_jobs;
 SET default_tablespace = '';
@@ -91,10 +91,10 @@ ALTER SEQUENCE public.failed_jobs_id_seq OWNED BY public.failed_jobs.id;
 
 
 --
--- Name: habitacions; Type: TABLE; Schema: public; Owner: -
+-- Name: rooms; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.habitacions (
+CREATE TABLE public.rooms (
     id bigint NOT NULL,
     hotel_id bigint NOT NULL,
     tipo_habitacion character varying(255) NOT NULL,
@@ -102,16 +102,16 @@ CREATE TABLE public.habitacions (
     cantidad integer NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
-    CONSTRAINT habitacions_acomodacion_check CHECK (((acomodacion)::text = ANY (ARRAY[('SENCILLA'::character varying)::text, ('DOBLE'::character varying)::text, ('TRIPLE'::character varying)::text, ('CUADRUPLE'::character varying)::text]))),
-    CONSTRAINT habitacions_tipo_habitacion_check CHECK (((tipo_habitacion)::text = ANY (ARRAY[('ESTANDAR'::character varying)::text, ('JUNIOR'::character varying)::text, ('SUITE'::character varying)::text])))
+    CONSTRAINT rooms_acomodacion_check CHECK (((acomodacion)::text = ANY (ARRAY[('SENCILLA'::character varying)::text, ('DOBLE'::character varying)::text, ('TRIPLE'::character varying)::text, ('CUADRUPLE'::character varying)::text]))),
+    CONSTRAINT rooms_tipo_habitacion_check CHECK (((tipo_habitacion)::text = ANY (ARRAY[('ESTANDAR'::character varying)::text, ('JUNIOR'::character varying)::text, ('SUITE'::character varying)::text])))
 );
 
 
 --
--- Name: habitacions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: rooms_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.habitacions_id_seq
+CREATE SEQUENCE public.rooms_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -120,10 +120,10 @@ CREATE SEQUENCE public.habitacions_id_seq
 
 
 --
--- Name: habitacions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: rooms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.habitacions_id_seq OWNED BY public.habitacions.id;
+ALTER SEQUENCE public.rooms_id_seq OWNED BY public.rooms.id;
 
 
 --
@@ -283,10 +283,10 @@ ALTER TABLE ONLY public.failed_jobs ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: habitacions id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: rooms id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions ALTER COLUMN id SET DEFAULT nextval('public.habitacions_id_seq'::regclass);
+ALTER TABLE ONLY public.rooms ALTER COLUMN id SET DEFAULT nextval('public.rooms_id_seq'::regclass);
 
 
 --
@@ -324,22 +324,22 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- Data for Name: habitacions; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: rooms; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (1, 1, 'ESTANDAR', 'SENCILLA', 25, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (2, 1, 'JUNIOR', 'TRIPLE', 12, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (3, 1, 'ESTANDAR', 'DOBLE', 5, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (4, 2, 'ESTANDAR', 'SENCILLA', 30, '2025-06-09 03:49:20', '2025-06-09 03:49:20');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (5, 2, 'JUNIOR', 'TRIPLE', 20, '2025-06-09 03:49:20', '2025-06-09 03:49:20');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (6, 2, 'SUITE', 'DOBLE', 10, '2025-06-09 03:49:20', '2025-06-09 03:49:20');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (7, 3, 'ESTANDAR', 'DOBLE', 15, '2025-06-09 03:49:58', '2025-06-09 03:49:58');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (8, 3, 'JUNIOR', 'CUADRUPLE', 15, '2025-06-09 03:49:58', '2025-06-09 03:49:58');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (9, 3, 'SUITE', 'TRIPLE', 5, '2025-06-09 03:49:58', '2025-06-09 03:49:58');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (10, 4, 'ESTANDAR', 'SENCILLA', 20, '2025-06-09 03:50:30', '2025-06-09 03:50:30');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (11, 4, 'SUITE', 'SENCILLA', 8, '2025-06-09 03:50:30', '2025-06-09 03:50:30');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (12, 5, 'ESTANDAR', 'DOBLE', 25, '2025-06-09 03:50:41', '2025-06-09 03:50:41');
-INSERT INTO public.habitacions (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (13, 5, 'JUNIOR', 'TRIPLE', 15, '2025-06-09 03:50:41', '2025-06-09 03:50:41');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (1, 1, 'ESTANDAR', 'SENCILLA', 25, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (2, 1, 'JUNIOR', 'TRIPLE', 12, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (3, 1, 'ESTANDAR', 'DOBLE', 5, '2025-06-09 02:23:10', '2025-06-09 02:23:10');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (4, 2, 'ESTANDAR', 'SENCILLA', 30, '2025-06-09 03:49:20', '2025-06-09 03:49:20');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (5, 2, 'JUNIOR', 'TRIPLE', 20, '2025-06-09 03:49:20', '2025-06-09 03:49:20');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (6, 2, 'SUITE', 'DOBLE', 10, '2025-06-09 03:49:20', '2025-06-09 03:49:20');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (7, 3, 'ESTANDAR', 'DOBLE', 15, '2025-06-09 03:49:58', '2025-06-09 03:49:58');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (8, 3, 'JUNIOR', 'CUADRUPLE', 15, '2025-06-09 03:49:58', '2025-06-09 03:49:58');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (9, 3, 'SUITE', 'TRIPLE', 5, '2025-06-09 03:49:58', '2025-06-09 03:49:58');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (10, 4, 'ESTANDAR', 'SENCILLA', 20, '2025-06-09 03:50:30', '2025-06-09 03:50:30');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (11, 4, 'SUITE', 'SENCILLA', 8, '2025-06-09 03:50:30', '2025-06-09 03:50:30');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (12, 5, 'ESTANDAR', 'DOBLE', 25, '2025-06-09 03:50:41', '2025-06-09 03:50:41');
+INSERT INTO public.rooms (id, hotel_id, tipo_habitacion, acomodacion, cantidad, created_at, updated_at) VALUES (13, 5, 'JUNIOR', 'TRIPLE', 15, '2025-06-09 03:50:41', '2025-06-09 03:50:41');
 
 
 --
@@ -362,7 +362,7 @@ INSERT INTO public.migrations (id, migration, batch) VALUES (2, '2014_10_12_1000
 INSERT INTO public.migrations (id, migration, batch) VALUES (3, '2019_08_19_000000_create_failed_jobs_table', 1);
 INSERT INTO public.migrations (id, migration, batch) VALUES (4, '2019_12_14_000001_create_personal_access_tokens_table', 1);
 INSERT INTO public.migrations (id, migration, batch) VALUES (5, '2025_06_08_163238_create_hotels_table', 2);
-INSERT INTO public.migrations (id, migration, batch) VALUES (6, '2025_06_08_163249_create_habitacions_table', 2);
+INSERT INTO public.migrations (id, migration, batch) VALUES (6, '2025_06_08_163249_create_rooms_table', 2);
 
 
 --
@@ -391,10 +391,10 @@ SELECT pg_catalog.setval('public.failed_jobs_id_seq', 1, false);
 
 
 --
--- Name: habitacions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: rooms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.habitacions_id_seq', 13, true);
+SELECT pg_catalog.setval('public.rooms_id_seq', 13, true);
 
 
 --
@@ -442,11 +442,11 @@ ALTER TABLE ONLY public.failed_jobs
 
 
 --
--- Name: habitacions habitacions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rooms rooms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions
-    ADD CONSTRAINT habitacions_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.rooms
+    ADD CONSTRAINT rooms_pkey PRIMARY KEY (id);
 
 
 --
@@ -506,10 +506,10 @@ ALTER TABLE ONLY public.personal_access_tokens
 
 
 --
--- Name: habitacions unique_habitacion_config; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: rooms unique_habitacion_config; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions
+ALTER TABLE ONLY public.rooms
     ADD CONSTRAINT unique_habitacion_config UNIQUE (hotel_id, tipo_habitacion, acomodacion);
 
 
@@ -551,11 +551,11 @@ CREATE INDEX personal_access_tokens_tokenable_type_tokenable_id_index ON public.
 
 
 --
--- Name: habitacions habitacions_hotel_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: rooms rooms_hotel_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.habitacions
-    ADD CONSTRAINT habitacions_hotel_id_foreign FOREIGN KEY (hotel_id) REFERENCES public.hotels(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.rooms
+    ADD CONSTRAINT rooms_hotel_id_foreign FOREIGN KEY (hotel_id) REFERENCES public.hotels(id) ON DELETE CASCADE;
 
 
 --
