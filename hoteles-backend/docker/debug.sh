@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🔍 DEBUG: Script iniciado - $(date)"
+echo "🔍 DEBUG: Script iniciado correctamente - $(date)"
 echo "🔍 DEBUG: PORT = ${PORT:-NO DEFINIDO}"
 echo "🔍 DEBUG: Directorio actual = $(pwd)"
 echo "🔍 DEBUG: Usuario = $(whoami)"
