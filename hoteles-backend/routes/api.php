@@ -1,30 +1,48 @@
 <?php
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\HabitacionController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
-// Rutas de hoteles
-Route::apiResource('hotels', HotelController::class);
+// Ruta de prueba para verificar que la API funciona
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'API funcionando correctamente',
+        'timestamp' => now()->toISOString(),
+        'environment' => app()->environment(),
+        'laravel_version' => app()->version(),
+        'php_version' => PHP_VERSION,
+        'database' => [
+            'connected' => DB::connection()->getPdo() ? true : false,
+            'driver' => config('database.default')
+        ]
+    ]);
+});
 
-// Rutas de habitaciones por hotel
-Route::apiResource('hotels.habitaciones', HabitacionController::class)
-    ->except(['show']);
+// Rutas para hoteles
+Route::apiResource('hoteles', HotelController::class);
 
-// Rutas independientes de habitaciones
-Route::apiResource('habitaciones', HabitacionController::class)
-    ->only(['show', 'update', 'destroy']);
+// Rutas para habitaciones
+Route::apiResource('hoteles.habitaciones', HabitacionController::class)->shallow();
 
-// Endpoint para configuración de habitaciones
-Route::get('configuracion/habitaciones', [HabitacionController::class, 'getConfiguracion']);
+// Ruta adicional de información
+Route::get('/', function () {
+    return response()->json([
+        'message' => 'API de Hoteles Decameron',
+        'version' => '1.0',
+        'endpoints' => [
+            'hoteles' => '/api/hoteles',
+            'habitaciones' => '/api/hoteles/{hotel}/habitaciones',
+            'health' => '/api/health'
+        ]
+    ]);
+});

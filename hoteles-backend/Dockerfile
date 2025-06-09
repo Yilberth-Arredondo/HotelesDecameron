@@ -12,16 +12,20 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     postgresql-client \
     nginx \
-    supervisor
+    supervisor \
+    procps \
+    vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Limpiar cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Instalar Composer primero
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Instalar extensiones PHP necesarias para Laravel + PostgreSQL
+# Instalar extensiones PHP necesarias
 RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd
+
+# Configurar PHP
+RUN echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/memory.ini \
+    && echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/execution.ini \
+    && echo "post_max_size = 50M" >> /usr/local/etc/php/conf.d/upload.ini \
+    && echo "upload_max_filesize = 50M" >> /usr/local/etc/php/conf.d/upload.ini
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -29,32 +33,49 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar composer.json y composer.lock PRIMERO (para aprovechar cache de Docker)
+# Copiar archivos de composer primero (para cache de Docker)
 COPY composer.json composer.lock ./
 
-# Instalar dependencias de PHP (sin scripts y sin dev)
-RUN composer install --no-scripts --no-autoloader --no-dev
+# Instalar dependencias de PHP
+RUN composer install --no-scripts --no-autoloader --no-dev --prefer-dist
 
-# Ahora copiar el resto del código
+# Copiar el resto del código
 COPY . .
 
 # Generar autoloader optimizado
 RUN composer dump-autoload --optimize
 
-# Crear directorios necesarios
-RUN mkdir -p /var/log/nginx /var/cache/nginx storage/logs storage/framework/sessions storage/framework/views storage/framework/cache
+# Crear directorios necesarios con permisos correctos
+RUN mkdir -p \
+    /var/log/nginx \
+    /var/log/php-fpm \
+    /var/log/supervisor \
+    /var/cache/nginx \
+    /run/php \
+    storage/logs \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache/data \
+    bootstrap/cache \
+    && chown -R www-data:www-data /app \
+    && chmod -R 775 storage bootstrap/cache
 
-# Dar permisos
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+# Remover configuración default de nginx
+RUN rm -f /etc/nginx/sites-enabled/default
 
-# Copiar configuración de nginx
-COPY docker/nginx/default.conf /etc/nginx/sites-available/default
-
-# Exponer puerto
-EXPOSE 8080
+# Crear enlace simbólico para sites-enabled
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Script de inicio
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Exponer puerto (Railway lo sobrescribirá con $PORT)
+EXPOSE 8080
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8080}/health.php || exit 1
+
+# Comando de inicio
 CMD ["/start.sh"]
