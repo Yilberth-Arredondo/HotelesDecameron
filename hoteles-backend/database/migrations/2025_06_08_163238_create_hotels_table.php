@@ -6,30 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('hotels', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
             $table->string('direccion');
             $table->string('ciudad');
-            $table->string('nit')->unique();
-            $table->integer('numero_max_habitaciones');
+            $table->string('nit', 20)->unique();
+            $table->integer('numero_habitaciones');
             $table->timestamps();
-
-            // Índices para optimizar búsquedas
-            $table->index(['ciudad']);
-            $table->index(['nombre']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('hotels');
     }
