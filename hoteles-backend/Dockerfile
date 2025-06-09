@@ -51,7 +51,7 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 COPY docker/nginx/default.conf /etc/nginx/sites-available/default
 
 # Exponer puerto
-EXPOSE 8000
+EXPOSE 8080
 
 # Script de inicio
 COPY docker/start.sh /start.sh

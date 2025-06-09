@@ -14,5 +14,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return [
+        'status' => 'ok',
+        'message' => 'API de Hoteles Decameron funcionando',
+        'documentation' => '/api/documentation',
+        'endpoints' => [
+            'hoteles' => '/api/hotels',
+            'habitaciones' => '/api/habitacions'
+        ]
+    ];
 });
