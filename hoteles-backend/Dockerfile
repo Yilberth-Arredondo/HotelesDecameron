@@ -55,7 +55,7 @@ RUN mkdir -p \
     /run/php
 
 # Establecer permisos
-RUN chown -R www-data:www-data /app \
+RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # Remover configuración default de nginx
@@ -71,3 +71,6 @@ EXPOSE 8080
 
 # Comando de inicio
 CMD ["/start.sh"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8080}/test.php || exit 1
