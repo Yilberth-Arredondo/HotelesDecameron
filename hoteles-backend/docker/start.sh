@@ -2,52 +2,45 @@
 set -e
 
 echo "🚀 Iniciando aplicación Laravel en Railway..."
-echo "⏰ $(date)"
-
 PORT=${PORT:-8080}
-echo "📍 Puerto: $PORT"
 
-cd /app
+# Configurar PHP-FPM para escuchar en 127.0.0.1:9000
+echo "🔧 Configurando PHP-FPM..."
+cat > /usr/local/etc/php-fpm.d/www.conf << EOF
+[www]
+user = www-data
+group = www-data
+listen = 127.0.0.1:9000
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+EOF
 
-# Permisos básicos
-echo "🔧 Configurando permisos..."
-chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
-chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+# Configurar Nginx para usar el puerto correcto
+echo "🔧 Configurando Nginx para puerto $PORT..."
+cat > /etc/nginx/sites-available/default << EOF
+server {
+    listen $PORT default_server;
+    listen [::]:$PORT default_server;
+    root /app/public;
+    index index.php index.html;
+    
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+    
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+EOF
 
-# Verificar conexión a DB
-echo "🔍 Verificando base de datos..."
-php artisan tinker --execute="try { \DB::select('SELECT 1'); echo '✅ Base de datos conectada'; } catch (\Exception \$e) { echo '❌ Error DB: ' . \$e->getMessage(); }" || true
-echo ""
-
-# Limpiar caché
-echo "🧹 Limpiando caché..."
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-
-# Ejecutar migraciones
-echo "📦 Ejecutando migraciones..."
-php artisan migrate --force || echo "⚠️  Error en migraciones"
-
-# Ejecutar seeders
-echo "🌱 Ejecutando seeders..."
-php artisan db:seed --force || echo "⚠️  Error en seeders"
-
-# Cachear configuración
-echo "⚡ Optimizando..."
-php artisan config:cache
-php artisan route:cache
-
-# Mostrar información
-echo ""
-echo "✅ Aplicación lista!"
-echo "🌐 URL: $APP_URL"
-echo "📍 Puerto: $PORT"
-echo ""
-echo "📋 Endpoints disponibles:"
-echo "   - $APP_URL/api/health"
-echo "   - $APP_URL/api/hoteles"
-echo "   - $APP_URL/api/hoteles/{id}/habitaciones"
-echo ""
-echo "🚀 Iniciando servidor Laravel..."
-exec php artisan serve --host=0.0.0.0 --port=$PORT
+# Iniciar los servicios
+mkdir -p /run/php
+php-fpm -D
+nginx -g "daemon off;"
