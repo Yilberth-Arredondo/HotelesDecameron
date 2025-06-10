@@ -9,34 +9,80 @@ echo "📍 Puerto: $PORT"
 echo "🔧 Configurando PHP-FPM..."
 php-fpm -D
 
-# Configuración mínima de Nginx
+# Verificar que PHP-FPM está funcionando
+echo "🔍 Verificando PHP-FPM..."
+sleep 2
+if ! pgrep php-fpm > /dev/null; then
+    echo "❌ PHP-FPM no está funcionando"
+    exit 1
+fi
+echo "✅ PHP-FPM funcionando correctamente"
+
+# Configuración completa de Nginx
 echo "🔧 Configurando Nginx..."
-cat > /etc/nginx/sites-available/default << EOF
-server {
-    listen $PORT default_server;
-    root /app/public;
-    index index.php;
+cat > /etc/nginx/nginx.conf << EOF
+user www-data;
+worker_processes 1;
+pid /run/nginx.pid;
+error_log /var/log/nginx/error.log warn;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    access_log /var/log/nginx/access.log;
     
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
+    sendfile on;
+    keepalive_timeout 65;
     
-    location ~ \.php$ {
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        include fastcgi_params;
+    server {
+        listen $PORT;
+        root /app/public;
+        index index.php index.html;
+        
+        location / {
+            try_files \$uri \$uri/ /index.php?\$query_string;
+        }
+        
+        location ~ \.php$ {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+            include fastcgi_params;
+        }
+        
+        location ~ /\.ht {
+            deny all;
+        }
     }
 }
 EOF
 
-# Activar configuración y probar
-ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+# Verificar configuración de Nginx
+echo "🔍 Verificando configuración de Nginx..."
 nginx -t
+if [ $? -ne 0 ]; then
+    echo "❌ Error en configuración de Nginx"
+    exit 1
+fi
 
 # Setup Laravel básico
+echo "🔧 Configurando Laravel..."
 cd /app
 php artisan config:clear
 php artisan migrate --force || true
 
+# Crear archivo de prueba
+echo '<?php echo json_encode(["status" => "ok", "time" => date("c")]);' > /app/public/health.php
+
 echo "✅ Iniciando Nginx..."
-exec nginx -g "daemon off;"
+echo "📊 Estado antes de iniciar Nginx:"
+echo "- Puerto configurado: $PORT"
+echo "- PHP-FPM PID: $(pgrep php-fmp || echo 'No encontrado')"
+echo "- Directorio público: $(ls -la /app/public/ | head -3)"
+
+# Iniciar Nginx con logs de depuración
+exec nginx -g "daemon off; error_log /dev/stderr info;"
