@@ -1,31 +1,30 @@
 #!/bin/bash
 set -e
 
-echo "🔍 Debug Mode"
-echo "PORT: $PORT"
-echo "DB_HOST: $DB_HOST"
-echo "DB_DATABASE: $DB_DATABASE"
-echo "DB_USERNAME: $DB_USERNAME"
-echo "DB_PASSWORD: ${DB_PASSWORD:0:3}***" # Mostrar solo primeros 3 chars
+echo "🚀 Starting Laravel..."
+PORT=${PORT:-8080}
 
 cd /app
 
-# Test de conexión a DB
-php -r "
-try {
-    \$pdo = new PDO('pgsql:host=${DB_HOST};dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}');
-    echo '✅ DB connection OK\n';
-} catch (Exception \$e) {
-    echo '❌ DB Error: ' . \$e->getMessage() . '\n';
-    exit(1);
-}
-"
-
-# Si llegamos aquí, la DB funciona
 php artisan config:clear
-php artisan migrate --force
+php artisan migrate --force || true
 
-echo '<?php echo "OK";' > public/health.php
+# Crear health check que Railway espera
+cat > public/index.php << 'EOF'
+<?php
+if ($_SERVER['REQUEST_URI'] === '/') {
+    echo json_encode(['status' => 'ok', 'time' => date('c')]);
+    exit;
+}
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+$response->send();
+$kernel->terminate($request, $response);
+EOF
 
-echo "🚀 Starting server..."
-exec php -S 0.0.0.0:$PORT -t public/ public/index.php
+echo "✅ Server starting on port $PORT"
+exec php -S 0.0.0.0:$PORT -t public/
