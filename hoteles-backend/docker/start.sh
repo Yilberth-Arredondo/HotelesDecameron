@@ -9,7 +9,7 @@ PORT=${PORT:-8080}
 echo "📍 Puerto asignado por Railway: $PORT"
 
 # Crear directorios necesarios
-mkdir -p /run/nginx /var/log/nginx
+mkdir -p /run/nginx /var/log/nginx /run/php
 
 # Configurar PHP-FPM con configuración mínima
 echo "🔧 Configurando PHP-FPM..."
@@ -21,10 +21,7 @@ daemonize = no
 [www]
 user = www-data
 group = www-data
-listen = /run/php/php-fpm.sock
-listen.owner = www-data
-listen.group = www-data
-listen.mode = 0660
+listen = 127.0.0.1:9000
 pm = dynamic
 pm.max_children = 5
 pm.start_servers = 2
@@ -34,16 +31,13 @@ clear_env = no
 catch_workers_output = yes
 EOF
 
-# Crear directorio para el socket
-mkdir -p /run/php
-chown www-data:www-data /run/php
-
-# Configurar Nginx - NOTA: Usamos envsubst para asegurar que PORT se expanda
+# Configurar Nginx - NOTA: Ahora usamos bash para expandir la variable directamente
 echo "🔧 Configurando Nginx para puerto $PORT..."
-cat > /tmp/nginx.conf.template << 'EOF'
+# Aquí está el truco: usamos comillas dobles para que bash expanda $PORT
+cat > /etc/nginx/nginx.conf << EOF
 user www-data;
 worker_processes auto;
-pid /run/nginx/nginx.pid;
+pid /run/nginx.pid;
 error_log stderr;
 
 events {
@@ -62,14 +56,10 @@ http {
 
     access_log /dev/stdout;
 
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
-
     server {
-        listen ${PORT} default_server;
-        listen [::]:${PORT} default_server;
+        # Aquí $PORT se expandirá al valor real (8080)
+        listen $PORT default_server;
+        listen [::]:$PORT default_server;
         
         root /app/public;
         index index.php index.html;
@@ -78,41 +68,39 @@ http {
         
         # Archivo de health check
         location = /health.php {
-            try_files $uri =404;
-            fastcgi_pass unix:/run/php/php-fpm.sock;
+            try_files \$uri =404;
+            fastcgi_pass 127.0.0.1:9000;
             fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
             include fastcgi_params;
         }
         
         # Rutas de Laravel
         location / {
-            try_files $uri $uri/ /index.php?$query_string;
+            try_files \$uri \$uri/ /index.php?\$query_string;
         }
         
         # Procesamiento de PHP
         location ~ \.php$ {
-            try_files $uri =404;
+            try_files \$uri =404;
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:/run/php/php-fpm.sock;
+            fastcgi_pass 127.0.0.1:9000;
             fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
             include fastcgi_params;
         }
         
-        # Denegar acceso a archivos .ht*
-        location ~ /\.ht {
+        # Denegar acceso a archivos ocultos
+        location ~ /\. {
             deny all;
         }
     }
 }
 EOF
 
-# Expandir la variable PORT en la configuración
-envsubst '${PORT}' < /tmp/nginx.conf.template > /etc/nginx/nginx.conf
-
 # Verificar la configuración
 echo "🔍 Verificando configuración de Nginx..."
+echo "Puerto configurado: $PORT"
 nginx -t
 
 # Preparar Laravel
@@ -124,7 +112,17 @@ chmod -R 755 /app
 chmod -R 775 /app/storage /app/bootstrap/cache
 
 # Crear archivo de health check simple
-echo "<?php echo json_encode(['status' => 'ok', 'port' => $_SERVER['SERVER_PORT'] ?? 'unknown', 'time' => date('Y-m-d H:i:s')]);" > /app/public/health.php
+cat > /app/public/health.php << 'EOPHP'
+<?php
+header('Content-Type: application/json');
+echo json_encode([
+    'status' => 'ok',
+    'port' => $_SERVER['SERVER_PORT'] ?? 'unknown',
+    'time' => date('Y-m-d H:i:s'),
+    'php_version' => PHP_VERSION,
+    'server' => $_SERVER['SERVER_SOFTWARE'] ?? 'unknown'
+]);
+EOPHP
 chown www-data:www-data /app/public/health.php
 
 echo "🧹 Preparando Laravel..."
@@ -141,35 +139,28 @@ echo "⚡ Optimizando..."
 php artisan config:cache
 php artisan route:cache
 
-# Usar supervisord para manejar ambos procesos
-echo "🔧 Configurando Supervisor..."
-cat > /etc/supervisor/conf.d/laravel.conf << EOF
-[supervisord]
-nodaemon=true
-user=root
-logfile=/dev/stdout
-logfile_maxbytes=0
-pidfile=/var/run/supervisord.pid
+# Iniciar PHP-FPM en segundo plano
+echo "🚀 Iniciando PHP-FPM..."
+php-fpm &
+PHP_FPM_PID=$!
 
-[program:php-fpm]
-command=php-fpm -F
-autostart=true
-autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
+# Esperar a que PHP-FPM esté listo
+sleep 3
 
-[program:nginx]
-command=nginx -g "daemon off;"
-autostart=true
-autorestart=true
-stdout_logfile=/dev/stdout
-stdout_logfile_maxbytes=0
-stderr_logfile=/dev/stderr
-stderr_logfile_maxbytes=0
-depends_on=php-fpm
-EOF
+# Verificar que PHP-FPM esté ejecutándose
+if ! kill -0 $PHP_FPM_PID 2>/dev/null; then
+    echo "❌ Error: PHP-FPM no pudo iniciar"
+    echo "Intentando ver qué salió mal..."
+    php-fpm -t
+    exit 1
+fi
+
+echo "✅ PHP-FPM iniciado correctamente (PID: $PHP_FPM_PID)"
+
+# Verificación rápida local
+echo "🧪 Verificando que el servidor responde localmente..."
+sleep 2
+curl -s http://localhost:$PORT/health.php || echo "⚠️  No se pudo verificar localmente"
 
 echo ""
 echo "✅ Configuración completa"
@@ -178,7 +169,7 @@ echo "   ${APP_URL}/health.php"
 echo "   ${APP_URL}/api/health"
 echo "   ${APP_URL}/api/hoteles"
 echo ""
-echo "🚀 Iniciando servicios con Supervisor..."
+echo "🌐 Iniciando Nginx en puerto $PORT..."
 
-# Iniciar supervisor
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/laravel.conf
+# Iniciar Nginx en primer plano
+exec nginx -g "daemon off;"
