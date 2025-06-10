@@ -1,4 +1,3 @@
-# Usar la imagen base de PHP-FPM en lugar de CLI
 FROM php:8.1-fpm
 
 # Instalar dependencias del sistema

@@ -5,7 +5,7 @@ echo "🚀 Iniciando aplicación Laravel en Railway..."
 PORT=${PORT:-8080}
 echo "📍 Puerto: $PORT"
 
-# Setup Laravel básico primero
+# Setup Laravel
 echo "🔧 Configurando Laravel..."
 cd /app
 php artisan config:clear
@@ -14,13 +14,28 @@ php artisan migrate --force || true
 # Crear archivo de prueba
 echo '<?php echo json_encode(["status" => "ok", "time" => date("c")]);' > /app/public/health.php
 
+# Configuración de PHP-FPM
+echo "🔧 Configurando PHP-FPM..."
+cat > /usr/local/etc/php-fpm.d/www.conf << EOF
+[www]
+user = www-data
+group = www-data
+listen = 127.0.0.1:9000
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+clear_env = no
+EOF
+
 # Configuración de Nginx
 echo "🔧 Configurando Nginx..."
 cat > /etc/nginx/nginx.conf << EOF
 user www-data;
 worker_processes 1;
 pid /run/nginx.pid;
-error_log /var/log/nginx/error.log warn;
+error_log /dev/stderr warn;
 
 events {
     worker_connections 1024;
@@ -29,7 +44,7 @@ events {
 http {
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
-    access_log /var/log/nginx/access.log;
+    access_log /dev/stdout;
     
     sendfile on;
     keepalive_timeout 65;
@@ -46,19 +61,33 @@ http {
         location ~ \.php$ {
             fastcgi_pass 127.0.0.1:9000;
             fastcgi_index index.php;
-            fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
+            fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
             include fastcgi_params;
         }
     }
 }
 EOF
 
-# Configurar Supervisor
+# Verificar configuración
+nginx -t
+
+# Configuración completa de Supervisor
 echo "🔧 Configurando Supervisor..."
-cat > /etc/supervisor/conf.d/app.conf << EOF
+cat > /etc/supervisor/supervisord.conf << EOF
 [supervisord]
 nodaemon=true
-loglevel=info
+logfile=/dev/stdout
+logfile_maxbytes=0
+pidfile=/var/run/supervisord.pid
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[unix_http_server]
+file=/var/run/supervisor.sock
+
+[supervisorctl]
+serverurl=unix:///var/run/supervisor.sock
 
 [program:php-fpm]
 command=php-fpm -F
@@ -79,29 +108,5 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 EOF
 
-# Verificar configuración de Nginx
-echo "🔍 Verificando configuración de Nginx..."
-nginx -t
-
-echo "✅ Iniciando Supervisor con PHP-FPM y Nginx..."
-
-# Iniciar supervisor en background para poder hacer diagnóstico
-supervisord -c /etc/supervisor/supervisord.conf &
-SUPERVISOR_PID=$!
-
-# Esperar que los servicios inicien
-sleep 5
-
-# Diagnóstico
-echo "🔍 DIAGNÓSTICO POST-INICIO:"
-echo "- Supervisor PID: $SUPERVISOR_PID"
-echo "- Procesos nginx: $(pgrep nginx || echo 'ninguno')"
-echo "- Procesos php-fpm: $(pgrep php-fmp || echo 'ninguno')"
-echo "- Puerto configurado: $PORT"
-echo "- Netstat:"
-netstat -tlnp | grep :$PORT || echo "Puerto $PORT no está escuchando"
-echo "- Test HTTP local:"
-curl -I "http://127.0.0.1:$PORT/health.php" 2>&1 || echo "Request HTTP falló"
-
-# Mantener supervisor en foreground
-wait $SUPERVISOR_PID
+echo "✅ Iniciando servicios..."
+exec supervisord -c /etc/supervisor/supervisord.conf
