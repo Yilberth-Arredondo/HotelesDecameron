@@ -1,4 +1,10 @@
 <?php
 
 header('Content-Type: application/json');
-echo json_encode(['status' => 'ok', 'message' => 'Test file working']);
+header('X-Response-Time: ' . (microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]));
+
+echo json_encode([
+    'ok' => true,
+    'endpoint' => 'test.php',
+    'time' => date('c')
+]);
