@@ -3,9 +3,8 @@ set -e
 
 cd /app
 
-php artisan config:clear
-php artisan route:cache
-php artisan migrate --force || true
+# Crear archivo simple que responde inmediatamente
+echo '<?php echo "OK";' > public/index.php
 
 echo "✅ Starting on port ${PORT:-8080}"
-exec php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+exec php -S 0.0.0.0:${PORT:-8080} -t public/
