@@ -84,4 +84,24 @@ echo "🔍 Verificando configuración de Nginx..."
 nginx -t
 
 echo "✅ Iniciando Supervisor con PHP-FPM y Nginx..."
-exec supervisord -c /etc/supervisor/supervisord.conf
+
+# Iniciar supervisor en background para poder hacer diagnóstico
+supervisord -c /etc/supervisor/supervisord.conf &
+SUPERVISOR_PID=$!
+
+# Esperar que los servicios inicien
+sleep 5
+
+# Diagnóstico
+echo "🔍 DIAGNÓSTICO POST-INICIO:"
+echo "- Supervisor PID: $SUPERVISOR_PID"
+echo "- Procesos nginx: $(pgrep nginx || echo 'ninguno')"
+echo "- Procesos php-fpm: $(pgrep php-fmp || echo 'ninguno')"
+echo "- Puerto configurado: $PORT"
+echo "- Netstat:"
+netstat -tlnp | grep :$PORT || echo "Puerto $PORT no está escuchando"
+echo "- Test HTTP local:"
+curl -I "http://127.0.0.1:$PORT/health.php" 2>&1 || echo "Request HTTP falló"
+
+# Mantener supervisor en foreground
+wait $SUPERVISOR_PID
