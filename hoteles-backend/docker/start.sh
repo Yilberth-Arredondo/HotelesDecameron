@@ -99,5 +99,5 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 EOF
 
-echo "✅ Iniciando con Supervisor..."
+echo "Iniciando con Supervisor..."
 exec supervisord -c /etc/supervisor/conf.d/app.conf
