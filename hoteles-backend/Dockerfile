@@ -80,8 +80,9 @@ RUN chmod +x /start.sh
 EXPOSE 8080
 
 # Healthcheck mejorado que verifica tanto PHP como Nginx
+# SOLUCIÓN - Usar variable de entorno PORT:
 HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
-  CMD curl -f http://127.0.0.1:8080/health.php || exit 1
+  CMD curl -f http://127.0.0.1:${PORT:-8080}/health.php || exit 1
 
 # Comando de inicio
 CMD ["/start.sh"]
