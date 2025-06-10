@@ -67,5 +67,6 @@ EXPOSE 8080
 # Comando de inicio
 CMD ["/start.sh"]
 
+# Reemplazar el healthcheck actual con:
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://127.0.0.1:8080/test.php || exit 1
+  CMD curl -f http://127.0.0.1:8080/ || exit 1
