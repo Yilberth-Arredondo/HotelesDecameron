@@ -99,5 +99,8 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 EOF
 
+sed -i "s/listen 8080/listen $PORT/g" /etc/nginx/sites-available/default
+sed -i "s/listen \[::\]:8080/listen \[::\]:$PORT/g" /etc/nginx/sites-available/default
+
 echo "✅ Iniciando con Supervisor..."
 exec supervisord -c /etc/supervisor/conf.d/app.conf
