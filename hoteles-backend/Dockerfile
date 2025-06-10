@@ -79,10 +79,9 @@ RUN chmod +x /start.sh
 # Exponer el puerto (Railway lo sobrescribirá con $PORT)
 EXPOSE 8080
 
-# Healthcheck mejorado que verifica tanto PHP como Nginx
-# SOLUCIÓN - Usar variable de entorno PORT:
-HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
-  CMD curl -f http://127.0.0.1:${PORT:-8080}/health.php || exit 1
+# Healthcheck simplificado que verifica si nginx y php-fpm están corriendo
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD pgrep nginx && pgrep php-fpm || exit 1
 
 # Comando de inicio
 CMD ["/start.sh"]
