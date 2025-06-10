@@ -5,20 +5,16 @@ echo "🚀 Iniciando aplicación Laravel en Railway..."
 PORT=${PORT:-8080}
 echo "📍 Puerto: $PORT"
 
-# Configuración mínima de PHP-FPM
-echo "🔧 Configurando PHP-FPM..."
-php-fpm -D
+# Setup Laravel básico primero
+echo "🔧 Configurando Laravel..."
+cd /app
+php artisan config:clear
+php artisan migrate --force || true
 
-# Verificar que PHP-FPM está funcionando
-echo "🔍 Verificando PHP-FPM..."
-sleep 2
-if ! pgrep php-fpm > /dev/null; then
-    echo "❌ PHP-FPM no está funcionando"
-    exit 1
-fi
-echo "✅ PHP-FPM funcionando correctamente"
+# Crear archivo de prueba
+echo '<?php echo json_encode(["status" => "ok", "time" => date("c")]);' > /app/public/health.php
 
-# Configuración completa de Nginx
+# Configuración de Nginx
 echo "🔧 Configurando Nginx..."
 cat > /etc/nginx/nginx.conf << EOF
 user www-data;
@@ -53,36 +49,39 @@ http {
             fastcgi_param SCRIPT_FILENAME \$realpath_root\$fastcgi_script_name;
             include fastcgi_params;
         }
-        
-        location ~ /\.ht {
-            deny all;
-        }
     }
 }
+EOF
+
+# Configurar Supervisor
+echo "🔧 Configurando Supervisor..."
+cat > /etc/supervisor/conf.d/app.conf << EOF
+[supervisord]
+nodaemon=true
+loglevel=info
+
+[program:php-fpm]
+command=php-fpm -F
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+
+[program:nginx]
+command=nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 EOF
 
 # Verificar configuración de Nginx
 echo "🔍 Verificando configuración de Nginx..."
 nginx -t
-if [ $? -ne 0 ]; then
-    echo "❌ Error en configuración de Nginx"
-    exit 1
-fi
 
-# Setup Laravel básico
-echo "🔧 Configurando Laravel..."
-cd /app
-php artisan config:clear
-php artisan migrate --force || true
-
-# Crear archivo de prueba
-echo '<?php echo json_encode(["status" => "ok", "time" => date("c")]);' > /app/public/health.php
-
-echo "✅ Iniciando Nginx..."
-echo "📊 Estado antes de iniciar Nginx:"
-echo "- Puerto configurado: $PORT"
-echo "- PHP-FPM PID: $(pgrep php-fmp || echo 'No encontrado')"
-echo "- Directorio público: $(ls -la /app/public/ | head -3)"
-
-# Iniciar Nginx con logs de depuración
-exec nginx -g "daemon off; error_log /dev/stderr info;"
+echo "✅ Iniciando Supervisor con PHP-FPM y Nginx..."
+exec supervisord -c /etc/supervisor/supervisord.conf
