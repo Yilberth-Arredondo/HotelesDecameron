@@ -3,13 +3,8 @@ set -e
 
 cd /app
 
-# Asegurar que existe la ruta /api/health
-cat >> routes/api.php << 'EOF'
-
-Route::get('/health', function () {
-    return response()->json(['status' => 'ok', 'timestamp' => now()]);
-});
-EOF
+# Arreglar el import de DB
+sed -i '3a use Illuminate\Support\Facades\DB;' routes/api.php
 
 php artisan config:clear
 php artisan route:cache
