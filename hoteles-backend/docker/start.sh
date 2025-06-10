@@ -6,7 +6,7 @@ PORT=${PORT:-8080}
 echo "📍 Puerto: $PORT"
 
 # Configurar PHP-FPM - Más simple y directo
-cat > /usr/local/etc/php-fmp.conf << EOF
+cat > /usr/local/etc/php-fpm.conf << EOF
 [global]
 daemonize = no
 error_log = /proc/self/fd/2
@@ -99,5 +99,5 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 EOF
 
-echo "Iniciando con Supervisor..."
+echo "✅ Iniciando con Supervisor..."
 exec supervisord -c /etc/supervisor/conf.d/app.conf
