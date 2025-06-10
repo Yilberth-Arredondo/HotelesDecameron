@@ -9,22 +9,27 @@ cd /app
 php artisan config:clear
 php artisan migrate --force || true
 
-# Crear health check que Railway espera
-cat > public/index.php << 'EOF'
+# Crear un router simple para health check
+cat > public/router.php << 'EOF'
 <?php
-if ($_SERVER['REQUEST_URI'] === '/') {
-    echo json_encode(['status' => 'ok', 'time' => date('c')]);
-    exit;
+if (PHP_SAPI == 'cli-server') {
+    $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+    
+    // Health check para Railway
+    if ($uri === '/' || $uri === '/health') {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok', 'time' => date('c')]);
+        return true;
+    }
+    
+    // Si no es health check, dejar que Laravel maneje
+    if ($uri !== '/' && file_exists(__DIR__.$uri)) {
+        return false;
+    }
+    
+    require_once __DIR__.'/index.php';
 }
-require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
-$response->send();
-$kernel->terminate($request, $response);
 EOF
 
 echo "✅ Server starting on port $PORT"
-exec php -S 0.0.0.0:$PORT -t public/
+exec php -S 0.0.0.0:$PORT -t public/ public/router.php
