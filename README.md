@@ -155,8 +155,8 @@ sudo service postgresql start
 # Crear base de datos
 sudo -u postgres createdb hoteles_decameron
 
-# Cargar datos iniciales
-sudo -u postgres psql -d hoteles_decameron < database/hoteles_decameron_install.sql
+# Cargar datos iniciales (ubicado en hoteles-backend)
+sudo -u postgres psql -d hoteles_decameron < hoteles-backend/database/hoteles_decameron_install.sql
 ```
 
 ### 2. Backend (Laravel)
@@ -177,7 +177,7 @@ DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=hoteles_decameron
 DB_USERNAME=postgres
-DB_PASSWORD=postgres
+DB_PASSWORD=password
 
 # Ejecutar migraciones
 php artisan migrate
@@ -189,7 +189,7 @@ php artisan serve --port=8080
 ### 3. Frontend (React)
 
 ```bash
-cd hoteles-frontend
+cd ../hoteles-frontend
 
 # Instalar dependencias
 npm install
@@ -203,7 +203,7 @@ npm run dev
 ### Gestión de Hoteles
 
 - Registro y edición de hoteles
-- Validación de hoteles únicos por NIT
+- Validación de hoteles únicos por NIT y por nombre
 - Control de capacidad máxima de habitaciones
 
 ### Gestión de Habitaciones
@@ -225,7 +225,7 @@ npm run dev
 ### Reglas de Negocio
 
 - **Capacidad**: Las habitaciones configuradas no pueden superar el máximo del hotel
-- **Unicidad de Hoteles**: No se permiten hoteles duplicados (validación por NIT)
+- **Unicidad de Hoteles**: No se permiten hoteles duplicados (validación por NIT y por nombre)
 - **Configuraciones Únicas**: No se permiten combinaciones repetidas de tipo-acomodación por hotel
 
 ## 🧪 Testing
@@ -278,14 +278,15 @@ curl -X POST http://localhost:8080/api/hotels/1/habitaciones \
 
 #### Habitaciones
 
-- `GET /api/hotels/{hotel_id}/habitaciones` - Listar habitaciones de un hotel
-- `POST /api/hotels/{hotel_id}/habitaciones` - Crear configuración de habitaciones
-- `PUT /api/habitaciones/{id}` - Actualizar configuración
-- `DELETE /api/habitaciones/{id}` - Eliminar configuración
+- `GET /api/hotels/{hotel_id}/rooms` - Listar habitaciones de un hotel
+- `POST /api/hotels/{hotel_id}/rooms` - Crear configuración de habitaciones
+- `PUT /api/rooms/{id}` - Actualizar configuración
+- `DELETE /api/rooms/{id}` - Eliminar configuración
 
 #### Sistema
 
 - `GET /api/health` - Health check de la aplicación
+- `GET /api/ - Información general de la API con endpoints disponibles
 
 ### Verificar Frontend
 
