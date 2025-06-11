@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreHotelRequest;
+use App\Http\Requests\UpdateHotelRequest;
+use App\Http\Resources\HotelResource;
 use App\Models\Hotel;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class HotelController extends Controller
@@ -18,7 +20,7 @@ class HotelController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreHotelRequest $request): JsonResponse
     {
         $request->validate([
             'nombre' => 'required|string|unique:hotels',
@@ -47,7 +49,7 @@ class HotelController extends Controller
         ]);
     }
 
-    public function update(Request $request, Hotel $hotel): JsonResponse
+    public function update(UpdateHotelRequest $request, Hotel $hotel): JsonResponse
     {
         $request->validate([
             'nombre' => 'required|string|unique:hotels,nombre,' . $hotel->id,

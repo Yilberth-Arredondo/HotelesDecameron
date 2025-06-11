@@ -26,7 +26,7 @@ const HotelsList = () => {
     direccion: '',
     ciudad: '',
     nit: '',
-    numero_habitaciones: '',
+    numero_max_habitaciones: '',
   });
 
   useEffect(() => {
@@ -62,12 +62,43 @@ const HotelsList = () => {
       resetForm();
       loadHoteles();
     } catch (error) {
-      if (error.response?.data?.message) {
+      // DEBUG: Ver estructura completa del error
+      console.log('Error status:', error.response?.status);
+      console.log('Error data:', error.response?.data);
+      console.log(
+        'Error structure:',
+        JSON.stringify(error.response?.data, null, 2)
+      );
+
+      // Manejar errores de validación (422)
+      if (error.response?.status === 422) {
+        const data = error.response.data;
+
+        // Laravel puede devolver errores en diferentes estructuras
+        if (data.errors) {
+          // Estructura estándar de Laravel
+          Object.keys(data.errors).forEach((field) => {
+            data.errors[field].forEach((message) => {
+              toast.error(message);
+            });
+          });
+        } else if (data.message) {
+          // Mensaje directo
+          toast.error(data.message);
+        } else {
+          toast.error('Error de validación');
+        }
+      }
+      // Otros errores
+      else if (error.response?.data?.message) {
         toast.error(error.response.data.message);
-      } else {
+      }
+      // Error genérico
+      else {
         toast.error('Error al guardar hotel');
       }
-      console.error(error);
+
+      console.error('Error al guardar hotel:', error);
     }
   };
 
@@ -78,7 +109,7 @@ const HotelsList = () => {
       direccion: hotel.direccion,
       ciudad: hotel.ciudad,
       nit: hotel.nit,
-      numero_habitaciones: hotel.numero_max_habitaciones,
+      numero_max_habitaciones: hotel.numero_max_habitaciones,
     });
     setShowModal(true);
   };
@@ -108,7 +139,7 @@ const HotelsList = () => {
       direccion: '',
       ciudad: '',
       nit: '',
-      numero_habitaciones: '',
+      numero_max_habitaciones: '',
     });
     setEditingHotel(null);
   };
@@ -276,7 +307,10 @@ const HotelsList = () => {
             min='1'
             value={formData.numero_max_habitaciones}
             onChange={(e) =>
-              setFormData({ ...formData, numero_max_habitaciones: e.target.value })
+              setFormData({
+                ...formData,
+                numero_max_habitaciones: e.target.value,
+              })
             }
             required
             placeholder='Ej: 42'
