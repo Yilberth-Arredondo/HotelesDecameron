@@ -286,7 +286,7 @@ curl -X POST http://localhost:8080/api/hotels/1/habitaciones \
 #### Sistema
 
 - `GET /api/health` - Health check de la aplicación
-- `GET /api/ - Información general de la API con endpoints disponibles
+- `GET /api/` - Información general de la API con endpoints disponibles
 
 ### Verificar Frontend
 
