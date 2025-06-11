@@ -5,12 +5,14 @@ Sistema de gestión hotelera desarrollado con arquitectura desacoplada, permitie
 ## 🚀 Tecnologías
 
 ### Backend
+
 - **Framework**: Laravel (PHP 8.1+)
 - **Base de Datos**: PostgreSQL
 - **Arquitectura**: API REST
 - **Validaciones**: Reglas de negocio integradas
 
 ### Frontend
+
 - **Framework**: React 18+ con Vite
 - **Estilos**: Tailwind CSS + HeadlessUI
 - **Arquitectura**: SCREAMING (componentes organizados por funcionalidad)
@@ -30,8 +32,8 @@ Sistema de gestión hotelera desarrollado con arquitectura desacoplada, permitie
 
 ```bash
 # Clonar el repositorio
-git clone [URL-DEL-REPO] hoteles-decameron
-cd hoteles-decameron
+git clone git@github.com:Yilberth-Arredondo/HotelesDecameron.git
+cd HotelesDecameron
 
 # Ejecutar instalación automática
 chmod +x run.sh
@@ -39,6 +41,7 @@ chmod +x run.sh
 ```
 
 El script `run.sh` ejecutará automáticamente:
+
 - Configuración de la base de datos PostgreSQL
 - Instalación y configuración del backend (Laravel)
 - Instalación y configuración del frontend (React)
@@ -54,6 +57,8 @@ Una vez completada la instalación:
 - **Health Check**: http://localhost:8080/api/health
 
 ## 🏗️ Estructura del Proyecto
+
+### Back-end
 
 ```
 hoteles-decameron/
@@ -89,6 +94,52 @@ hoteles-decameron/
 ├── database/
 │   └── hoteles_decameron_install.sql  # Dump completo con datos
 └── run.sh                   # Script principal de instalación
+```
+
+### Front-end
+
+```
+├── README.md
+├── eslint.config.js
+├── index.html
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── procfile
+├── public
+│   └── vite.svg
+├── railway.json
+├── src
+│   ├── App.css
+│   ├── App.jsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── auth
+│   │   │   └── ProtectedRoute.jsx
+│   │   ├── layout
+│   │   │   ├── Layout.jsx
+│   │   │   └── Navbar.jsx
+│   │   └── ui
+│   │       ├── Button.jsx
+│   │       ├── Dropdown.jsx
+│   │       ├── Input.jsx
+│   │       └── Modal.jsx
+│   ├── context
+│   │   └── AuthContext.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   ├── Dashboard.jsx
+│   │   ├── Hotels
+│   │   │   ├── HotelDetail.jsx
+│   │   │   └── HotelsList.jsx
+│   │   └── LoginPage.jsx
+│   └── services
+│       ├── HotelService.js
+│       └── api.js
+├── tailwind.config.js
+└── vite.config.js
 ```
 
 ## 🔧 Instalación Manual
@@ -150,17 +201,20 @@ npm run dev
 ## 🏨 Funcionalidades Principales
 
 ### Gestión de Hoteles
+
 - Registro y edición de hoteles
 - Validación de hoteles únicos por NIT
 - Control de capacidad máxima de habitaciones
 
 ### Gestión de Habitaciones
+
 - Tipos: ESTÁNDAR, JUNIOR, SUITE
 - Acomodaciones: SENCILLA, DOBLE, TRIPLE, CUÁDRUPLE
 - Validación de configuraciones únicas por hotel
 - Control de límites por hotel
 
 ### Arquitectura Backend
+
 - **Controladores**: `HotelController`, `HabitacionController` con operaciones CRUD
 - **Modelos**: `Hotel`, `Habitacion` con relaciones y validaciones
 - **Requests**: Validaciones específicas para Store/Update operations
@@ -169,6 +223,7 @@ npm run dev
 - **Seeders**: Datos iniciales para testing y desarrollo
 
 ### Reglas de Negocio
+
 - **Capacidad**: Las habitaciones configuradas no pueden superar el máximo del hotel
 - **Unicidad de Hoteles**: No se permiten hoteles duplicados (validación por NIT)
 - **Configuraciones Únicas**: No se permiten combinaciones repetidas de tipo-acomodación por hotel
@@ -176,6 +231,7 @@ npm run dev
 ## 🧪 Testing
 
 ### Verificar Backend
+
 ```bash
 # Health check
 curl http://localhost:8080/api/health
@@ -213,6 +269,7 @@ curl -X POST http://localhost:8080/api/hotels/1/habitaciones \
 ### Endpoints Disponibles
 
 #### Hoteles
+
 - `GET /api/hotels` - Listar todos los hoteles
 - `POST /api/hotels` - Crear nuevo hotel
 - `GET /api/hotels/{id}` - Obtener hotel específico
@@ -220,15 +277,18 @@ curl -X POST http://localhost:8080/api/hotels/1/habitaciones \
 - `DELETE /api/hotels/{id}` - Eliminar hotel
 
 #### Habitaciones
+
 - `GET /api/hotels/{hotel_id}/habitaciones` - Listar habitaciones de un hotel
 - `POST /api/hotels/{hotel_id}/habitaciones` - Crear configuración de habitaciones
 - `PUT /api/habitaciones/{id}` - Actualizar configuración
 - `DELETE /api/habitaciones/{id}` - Eliminar configuración
 
 #### Sistema
+
 - `GET /api/health` - Health check de la aplicación
 
 ### Verificar Frontend
+
 - Navegar a http://localhost:3000
 - Verificar carga de hoteles
 - Probar navegación entre secciones
@@ -240,6 +300,7 @@ El sistema utiliza PostgreSQL con las siguientes entidades principales:
 ### Entidades Core del Negocio
 
 #### Hotels (hoteles)
+
 - **id**: Identificador único (BigInt, PK, Auto-increment)
 - **nombre**: Nombre del hotel (VARCHAR(255), UNIQUE, NOT NULL, INDEXED)
 - **direccion**: Dirección física (VARCHAR(255), NOT NULL)
@@ -249,6 +310,7 @@ El sistema utiliza PostgreSQL con las siguientes entidades principales:
 - **created_at / updated_at**: Timestamps de auditoría
 
 #### Rooms (habitaciones)
+
 - **id**: Identificador único (BigInt, PK, Auto-increment)
 - **hotel_id**: Referencia al hotel (BigInt, FK, NOT NULL)
 - **tipo_habitacion**: Tipo de habitación (VARCHAR, CHECK: ESTANDAR|JUNIOR|SUITE)
@@ -259,20 +321,24 @@ El sistema utiliza PostgreSQL con las siguientes entidades principales:
 ### Constraints y Validaciones
 
 #### Integridad Referencial
+
 - `rooms.hotel_id` → `hotels.id` (CASCADE DELETE)
 
 #### Constraints de Unicidad
+
 - `hotels.nombre` - No puede haber hoteles con el mismo nombre
 - `hotels.nit` - NIT único por hotel
 - `rooms(hotel_id, tipo_habitacion, acomodacion)` - Combinación única por hotel
 
 #### Validaciones de Negocio
+
 - **Tipos de habitación**: Solo ESTANDAR, JUNIOR, SUITE
 - **Acomodaciones**: Solo SENCILLA, DOBLE, TRIPLE, CUADRUPLE
 - **Cantidad**: Debe ser mayor a 0
 - **Capacidad total**: La suma de habitaciones no puede exceder `numero_max_habitaciones`
 
 ### Índices para Performance
+
 - `hotels.nombre` - Búsquedas por nombre
 - `hotels.ciudad` - Filtros por ubicación
 - `rooms.hotel_id` - Consultas de habitaciones por hotel
@@ -282,7 +348,7 @@ El sistema utiliza PostgreSQL con las siguientes entidades principales:
 El sistema incluye datos iniciales de 5 hoteles Decameron:
 
 1. **Decameron Cartagena** - 42 habitaciones máximo
-2. **Decameron San Andrés** - 60 habitaciones máximo  
+2. **Decameron San Andrés** - 60 habitaciones máximo
 3. **Decameron Marazul** - 35 habitaciones máximo
 4. **Decameron Barú** - 28 habitaciones máximo
 5. **Decameron Los Cocos** - 50 habitaciones máximo
@@ -331,6 +397,7 @@ src/
 ## 🚀 Despliegue
 
 Para despliegue en producción, revisar configuraciones de:
+
 - Variables de entorno (.env)
 - Configuración de CORS
 - Configuración de base de datos
