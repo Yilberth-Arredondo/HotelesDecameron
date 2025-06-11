@@ -31,7 +31,7 @@ Sistema de gestión hotelera desarrollado con arquitectura desacoplada, permitie
 ### 👀 Consideraciones iniciales
 - El despliegue local está pensado para trabajar correctamente con bash de unix SO Ubuntu22.04, los comandos para la CLI de windows pueden ser diferentes
 - Si tiene un Sistema windows se recomienda el uso de wsl para el correcto despliegue del proyecto
-- Se recomienda el uso del siguiente comando para iniciar el servicio correctamente sudo apt install -y php8.4-xml php8.4-curl php8.4-mbstring php8.4-zip php8.4-gd php8.4-bcmath php8.4-intl php8.4-pgsql
+- Se recomienda el uso del siguiente comando para iniciar el servicio correctamente **sudo apt install -y php8.4-xml php8.4-curl php8.4-mbstring php8.4-zip php8.4-gd php8.4-bcmath php8.4-intl php8.4-pgsql**
 
 
 ### Instalación Automática (Recomendada)
