@@ -28,6 +28,10 @@ Sistema de gestión hotelera desarrollado con arquitectura desacoplada, permitie
 
 ## ⚡ Instalación Rápida
 
+### 👀 Consideraciones iniciales
+- El despliegue local está pensado para trabajar correctamente con bash de unix SO Ubuntu22.04, los comandos para la CLI de windows pueden ser diferentes
+- Si tiene un Sistema windows se recomienda el uso de wsl para el correcto despliegue del proyecto
+
 ### Instalación Automática (Recomendada)
 
 ```bash
