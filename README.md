@@ -1,338 +1,346 @@
-# 🚀 Instalación Stack Completo - Hoteles Decameron
+# 🏨 Hoteles Decameron - Plataforma de Gestión Hotelera
 
-## 📋 Stack Requerido
-- **PHP 8.1+** (con extensiones)
-- **Composer** (gestor de dependencias PHP)
-- **Node.js 18+** y **npm**
-- **PostgreSQL 14+**
-- **Git**
-- **Editor de código** (VS Code recomendado)
+Sistema de gestión hotelera desarrollado con arquitectura desacoplada, permitiendo la administración de hoteles y configuración de habitaciones con validaciones de negocio robustas.
 
----
+## 🚀 Tecnologías
 
-# 🪟 **WINDOWS**
+### Backend
+- **Framework**: Laravel (PHP 8.1+)
+- **Base de Datos**: PostgreSQL
+- **Arquitectura**: API REST
+- **Validaciones**: Reglas de negocio integradas
 
-## 1. PHP y Composer
+### Frontend
+- **Framework**: React 18+ con Vite
+- **Estilos**: Tailwind CSS + HeadlessUI
+- **Arquitectura**: SCREAMING (componentes organizados por funcionalidad)
+- **Estado**: Context API + Services
 
-### Opción A: XAMPP (Recomendado para principiantes)
-```bash
-# 1. Descargar XAMPP con PHP 8.1+
-# https://www.apachefriends.org/download.html
+## 📋 Requisitos del Sistema
 
-# 2. Instalar XAMPP en C:\xampp
+- **PHP**: 8.1 o superior
+- **Composer**: 2.0+
+- **Node.js**: 16+ y npm
+- **PostgreSQL**: 12+
+- **Sistema**: Linux/WSL compatible
 
-# 3. Agregar PHP al PATH
-# Panel de Control > Sistema > Variables de entorno
-# Agregar: C:\xampp\php
+## ⚡ Instalación Rápida
 
-# 4. Verificar instalación
-php -v
-```
-
-### Opción B: PHP directo (Recomendado para desarrolladores)
-```bash
-# 1. Descargar PHP 8.1+ desde php.net
-# https://windows.php.net/download/
-
-# 2. Extraer en C:\php
-
-# 3. Copiar php.ini-development a php.ini
-
-# 4. Editar php.ini y habilitar extensiones:
-extension=pdo_pgsql
-extension=pgsql
-extension=openssl
-extension=curl
-extension=fileinfo
-extension=mbstring
-
-# 5. Agregar C:\php al PATH del sistema
-```
-
-### Instalar Composer
-```bash
-# 1. Descargar desde getcomposer.org
-# https://getcomposer.org/Composer-Setup.exe
-
-# 2. Ejecutar el instalador
-
-# 3. Verificar
-composer -V
-```
-
-## 2. Node.js y npm
-```bash
-# 1. Descargar Node.js LTS desde nodejs.org
-# https://nodejs.org/
-
-# 2. Instalar con las opciones por defecto
-
-# 3. Verificar instalación
-node -v
-npm -v
-```
-
-## 3. PostgreSQL
-```bash
-# 1. Descargar PostgreSQL 14+ desde postgresql.org
-# https://www.postgresql.org/download/windows/
-
-# 2. Durante la instalación:
-#    - Puerto: 5432 (default)
-#    - Usuario: postgres
-#    - Contraseña: [tu_password]
-
-# 3. Verificar instalación
-psql -U postgres -h localhost
-```
-
-## 4. Git
-```bash
-# 1. Descargar Git para Windows
-# https://git-scm.com/download/win
-
-# 2. Instalar con configuración por defecto
-
-# 3. Configurar usuario
-git config --global user.name "Tu Nombre"
-git config --global user.email "tu@email.com"
-```
-
----
-
-# 🍎 **macOS**
-
-## 1. Homebrew (Gestor de paquetes)
-```bash
-# Instalar Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Agregar al PATH
-echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-## 2. PHP y Composer
-```bash
-# Instalar PHP
-brew install php@8.1
-
-# Agregar al PATH
-echo 'export PATH="/opt/homebrew/opt/php@8.1/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-
-# Verificar
-php -v
-
-# Instalar Composer
-brew install composer
-
-# Verificar
-composer -V
-```
-
-## 3. Node.js y npm
-```bash
-# Opción 1: Con Homebrew
-brew install node
-
-# Opción 2: Con NVM (recomendado)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.zshrc
-nvm install --lts
-nvm use --lts
-
-# Verificar
-node -v
-npm -v
-```
-
-## 4. PostgreSQL
-```bash
-# Instalar PostgreSQL
-brew install postgresql@14
-
-# Iniciar servicio
-brew services start postgresql@14
-
-# Crear usuario
-createdb $(whoami)
-psql postgres -c "CREATE USER postgres WITH PASSWORD 'password' SUPERUSER;"
-
-# Verificar
-psql -U postgres -h localhost
-```
-
-## 5. Git
-```bash
-# Git viene preinstalado en macOS, pero actualizar:
-brew install git
-
-# Configurar
-git config --global user.name "Tu Nombre"
-git config --global user.email "tu@email.com"
-```
-
----
-
-# 🐧 **LINUX (Ubuntu/Debian)**
-
-## 1. Actualizar sistema
-```bash
-sudo apt update && sudo apt upgrade -y
-```
-
-## 2. PHP y Composer
-```bash
-# Instalar PHP y extensiones
-sudo apt install -y php8.1 php8.1-cli php8.1-common php8.1-mysql php8.1-pgsql \
-php8.1-zip php8.1-gd php8.1-mbstring php8.1-curl php8.1-xml php8.1-bcmath
-
-# Verificar PHP
-php -v
-
-# Instalar Composer
-curl -sS https://getcomposer.org/installer | php
-sudo mv composer.phar /usr/local/bin/composer
-sudo chmod +x /usr/local/bin/composer
-
-# Verificar Composer
-composer -V
-```
-
-## 3. Node.js y npm
-```bash
-# Opción 1: Desde repositorios
-sudo apt install -y nodejs npm
-
-# Opción 2: Con NVM (recomendado)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.bashrc
-nvm install --lts
-nvm use --lts
-
-# Verificar
-node -v
-npm -v
-```
-
-## 4. PostgreSQL
-```bash
-# Instalar PostgreSQL
-sudo apt install -y postgresql postgresql-contrib
-
-# Iniciar servicio
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-
-# Configurar usuario
-sudo -u postgres psql -c "CREATE USER postgres WITH PASSWORD 'password' SUPERUSER;"
-
-# Verificar
-sudo -u postgres psql
-```
-
-## 5. Git
-```bash
-# Instalar Git
-sudo apt install -y git
-
-# Configurar
-git config --global user.name "Tu Nombre"
-git config --global user.email "tu@email.com"
-```
-
----
-
-# ✅ **Verificación de Instalación**
-
-Ejecuta estos comandos para verificar que todo esté instalado correctamente:
+### Instalación Automática (Recomendada)
 
 ```bash
-# PHP
-php -v
-# Debería mostrar: PHP 8.1.x
+# Clonar el repositorio
+git clone [URL-DEL-REPO] hoteles-decameron
+cd hoteles-decameron
 
-# Composer
-composer -V
-# Debería mostrar: Composer version 2.x
-
-# Node.js
-node -v
-# Debería mostrar: v18.x.x o superior
-
-# npm
-npm -v
-# Debería mostrar: 9.x.x o superior
-
-# PostgreSQL
-psql --version
-# Debería mostrar: psql (PostgreSQL) 14.x
-
-# Git
-git --version
-# Debería mostrar: git version 2.x
+# Ejecutar instalación automática
+chmod +x run.sh
+./run.sh
 ```
 
----
+El script `run.sh` ejecutará automáticamente:
+- Configuración de la base de datos PostgreSQL
+- Instalación y configuración del backend (Laravel)
+- Instalación y configuración del frontend (React)
+- Carga de datos iniciales
+- Inicio de ambos servidores
 
-# 🔧 **Configuración Adicional**
+### URLs de Acceso
 
-## VS Code (Editor recomendado)
+Una vez completada la instalación:
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080/api
+- **Health Check**: http://localhost:8080/api/health
+
+## 🏗️ Estructura del Proyecto
+
+```
+hoteles-decameron/
+├── hoteles-backend/          # API Laravel
+│   ├── app/
+│   │   ├── Http/
+│   │   │   ├── Controllers/  # HotelController, HabitacionController
+│   │   │   ├── Requests/     # Validaciones de entrada
+│   │   │   └── Resources/    # Transformadores de respuesta
+│   │   ├── Models/           # Hotel, Habitacion, User
+│   │   └── Providers/        # Configuración de servicios
+│   ├── database/
+│   │   ├── migrations/       # Estructura de BD
+│   │   ├── seeders/          # Datos iniciales
+│   │   └── hoteles_decameron_install.sql
+│   ├── routes/
+│   │   ├── api.php          # Rutas de la API
+│   │   └── web.php          # Rutas web
+│   ├── config/              # Configuración (CORS, DB, etc.)
+│   ├── public/              # Punto de entrada (health.php)
+│   └── run-backend.sh       # Script de instalación backend
+├── hoteles-frontend/        # Aplicación React
+│   ├── src/
+│   │   ├── components/      # Componentes UI organizados por tipo
+│   │   │   ├── auth/        # ProtectedRoute
+│   │   │   ├── layout/      # Layout, Navbar
+│   │   │   └── ui/          # Button, Modal, Input, Dropdown
+│   │   ├── pages/           # Dashboard, Hotels/, LoginPage
+│   │   ├── services/        # HotelService, api.js
+│   │   └── context/         # AuthContext
+│   ├── public/              # Archivos estáticos
+│   └── run-frontend.sh      # Script de instalación frontend
+├── database/
+│   └── hoteles_decameron_install.sql  # Dump completo con datos
+└── run.sh                   # Script principal de instalación
+```
+
+## 🔧 Instalación Manual
+
+Si prefieres instalar manualmente cada componente:
+
+### 1. Base de Datos
+
 ```bash
-# Extensiones útiles:
-# - PHP Intelephense
-# - Laravel Extension Pack
-# - ES7+ React/Redux/React-Native snippets
-# - Thunder Client (para probar APIs)
-# - GitLens
+# Iniciar PostgreSQL
+sudo service postgresql start
+
+# Crear base de datos
+sudo -u postgres createdb hoteles_decameron
+
+# Cargar datos iniciales
+sudo -u postgres psql -d hoteles_decameron < database/hoteles_decameron_install.sql
 ```
 
-## Variables de Entorno Globales
+### 2. Backend (Laravel)
+
 ```bash
-# Windows (PowerShell como administrador)
-[Environment]::SetEnvironmentVariable("COMPOSER_HOME", "$env:APPDATA\Composer", "User")
+cd hoteles-backend
 
-# macOS/Linux (.bashrc o .zshrc)
-export COMPOSER_HOME="$HOME/.composer"
-export PATH="$COMPOSER_HOME/vendor/bin:$PATH"
+# Instalar dependencias
+composer install
+
+# Configurar entorno
+cp .env.example .env
+php artisan key:generate
+
+# Configurar base de datos en .env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=hoteles_decameron
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+
+# Ejecutar migraciones
+php artisan migrate
+
+# Iniciar servidor
+php artisan serve --port=8080
 ```
 
----
+### 3. Frontend (React)
 
-# 🚨 **Solución de Problemas Comunes**
-
-## PHP no encuentra extensiones
 ```bash
-# Verificar extensiones habilitadas
-php -m
+cd hoteles-frontend
 
-# Si faltan extensiones, editar php.ini y descomentar:
-extension=pdo_pgsql
-extension=pgsql
-extension=openssl
-extension=curl
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm run dev
 ```
 
-## Composer muy lento
+## 🏨 Funcionalidades Principales
+
+### Gestión de Hoteles
+- Registro y edición de hoteles
+- Validación de hoteles únicos por NIT
+- Control de capacidad máxima de habitaciones
+
+### Gestión de Habitaciones
+- Tipos: ESTÁNDAR, JUNIOR, SUITE
+- Acomodaciones: SENCILLA, DOBLE, TRIPLE, CUÁDRUPLE
+- Validación de configuraciones únicas por hotel
+- Control de límites por hotel
+
+### Arquitectura Backend
+- **Controladores**: `HotelController`, `HabitacionController` con operaciones CRUD
+- **Modelos**: `Hotel`, `Habitacion` con relaciones y validaciones
+- **Requests**: Validaciones específicas para Store/Update operations
+- **Resources**: Transformadores de datos para respuestas JSON consistentes
+- **Migraciones**: Estructura de BD con constraints y índices optimizados
+- **Seeders**: Datos iniciales para testing y desarrollo
+
+### Reglas de Negocio
+- **Capacidad**: Las habitaciones configuradas no pueden superar el máximo del hotel
+- **Unicidad de Hoteles**: No se permiten hoteles duplicados (validación por NIT)
+- **Configuraciones Únicas**: No se permiten combinaciones repetidas de tipo-acomodación por hotel
+
+## 🧪 Testing
+
+### Verificar Backend
 ```bash
-# Configurar mirror más rápido
-composer config -g repo.packagist composer https://packagist.org
+# Health check
+curl http://localhost:8080/api/health
+
+# Listar hoteles
+curl http://localhost:8080/api/hotels
+
+# Obtener hotel específico
+curl http://localhost:8080/api/hotels/1
+
+# Obtener habitaciones de un hotel
+curl http://localhost:8080/api/hotels/1/habitaciones
+
+# Crear nuevo hotel (POST)
+curl -X POST http://localhost:8080/api/hotels \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Hotel Test",
+    "direccion": "Calle Test 123",
+    "ciudad": "Ciudad Test",
+    "nit": "123456789-0",
+    "numero_max_habitaciones": 30
+  }'
+
+# Crear configuración de habitaciones (POST)
+curl -X POST http://localhost:8080/api/hotels/1/habitaciones \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo_habitacion": "ESTANDAR",
+    "acomodacion": "DOBLE",
+    "cantidad": 10
+  }'
 ```
 
-## Node.js versión incorrecta
+### Endpoints Disponibles
+
+#### Hoteles
+- `GET /api/hotels` - Listar todos los hoteles
+- `POST /api/hotels` - Crear nuevo hotel
+- `GET /api/hotels/{id}` - Obtener hotel específico
+- `PUT /api/hotels/{id}` - Actualizar hotel
+- `DELETE /api/hotels/{id}` - Eliminar hotel
+
+#### Habitaciones
+- `GET /api/hotels/{hotel_id}/habitaciones` - Listar habitaciones de un hotel
+- `POST /api/hotels/{hotel_id}/habitaciones` - Crear configuración de habitaciones
+- `PUT /api/habitaciones/{id}` - Actualizar configuración
+- `DELETE /api/habitaciones/{id}` - Eliminar configuración
+
+#### Sistema
+- `GET /api/health` - Health check de la aplicación
+
+### Verificar Frontend
+- Navegar a http://localhost:3000
+- Verificar carga de hoteles
+- Probar navegación entre secciones
+
+## 🗄️ Modelo de Base de Datos
+
+El sistema utiliza PostgreSQL con las siguientes entidades principales:
+
+### Entidades Core del Negocio
+
+#### Hotels (hoteles)
+- **id**: Identificador único (BigInt, PK, Auto-increment)
+- **nombre**: Nombre del hotel (VARCHAR(255), UNIQUE, NOT NULL, INDEXED)
+- **direccion**: Dirección física (VARCHAR(255), NOT NULL)
+- **ciudad**: Ciudad donde se ubica (VARCHAR(255), NOT NULL, INDEXED)
+- **nit**: Número de identificación tributaria (VARCHAR(255), UNIQUE, NOT NULL)
+- **numero_max_habitaciones**: Capacidad máxima de habitaciones (INTEGER, NOT NULL)
+- **created_at / updated_at**: Timestamps de auditoría
+
+#### Rooms (habitaciones)
+- **id**: Identificador único (BigInt, PK, Auto-increment)
+- **hotel_id**: Referencia al hotel (BigInt, FK, NOT NULL)
+- **tipo_habitacion**: Tipo de habitación (VARCHAR, CHECK: ESTANDAR|JUNIOR|SUITE)
+- **acomodacion**: Tipo de acomodación (VARCHAR, CHECK: SENCILLA|DOBLE|TRIPLE|CUADRUPLE)
+- **cantidad**: Número de habitaciones de este tipo (INTEGER, NOT NULL, CHECK > 0)
+- **created_at / updated_at**: Timestamps de auditoría
+
+### Constraints y Validaciones
+
+#### Integridad Referencial
+- `rooms.hotel_id` → `hotels.id` (CASCADE DELETE)
+
+#### Constraints de Unicidad
+- `hotels.nombre` - No puede haber hoteles con el mismo nombre
+- `hotels.nit` - NIT único por hotel
+- `rooms(hotel_id, tipo_habitacion, acomodacion)` - Combinación única por hotel
+
+#### Validaciones de Negocio
+- **Tipos de habitación**: Solo ESTANDAR, JUNIOR, SUITE
+- **Acomodaciones**: Solo SENCILLA, DOBLE, TRIPLE, CUADRUPLE
+- **Cantidad**: Debe ser mayor a 0
+- **Capacidad total**: La suma de habitaciones no puede exceder `numero_max_habitaciones`
+
+### Índices para Performance
+- `hotels.nombre` - Búsquedas por nombre
+- `hotels.ciudad` - Filtros por ubicación
+- `rooms.hotel_id` - Consultas de habitaciones por hotel
+
+## 🔍 Datos de Prueba
+
+El sistema incluye datos iniciales de 5 hoteles Decameron:
+
+1. **Decameron Cartagena** - 42 habitaciones máximo
+2. **Decameron San Andrés** - 60 habitaciones máximo  
+3. **Decameron Marazul** - 35 habitaciones máximo
+4. **Decameron Barú** - 28 habitaciones máximo
+5. **Decameron Los Cocos** - 50 habitaciones máximo
+
+## 🛠️ Desarrollo
+
+### Comandos Útiles
+
 ```bash
-# Con NVM cambiar versión
-nvm list
-nvm use 18.19.0
+# Backend - Limpiar caché
+cd hoteles-backend
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+
+# Frontend - Build para producción
+cd hoteles-frontend
+npm run build
+
+# Reiniciar base de datos
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS hoteles_decameron;"
+./run.sh
 ```
 
-## PostgreSQL no se conecta
-```bash
-# Verificar si está corriendo
-# Windows: Servicios > PostgreSQL
-# macOS: brew services list
-# Linux: sudo systemctl status postgresql
+### Arquitectura Frontend (SCREAMING)
+
+```
+src/
+├── components/
+│   ├── auth/           # Componentes de autenticación
+│   ├── layout/         # Layout y navegación
+│   └── ui/             # Componentes UI reutilizables
+├── pages/              # Páginas organizadas por funcionalidad
+│   └── Hotels/         # Gestión de hoteles
+├── services/           # Comunicación con API
+└── context/            # Estado global de la aplicación
 ```
 
----
+## 📝 Notas de Desarrollo
+
+- **Backend**: Utiliza validaciones a nivel de modelo y request
+- **Frontend**: Considera implementar custom hooks para gestión de estado en proyectos más grandes
+- **Base de Datos**: Incluye constraints y triggers para integridad de datos
+- **CORS**: Configurado para desarrollo local (localhost:3000)
+
+## 🚀 Despliegue
+
+Para despliegue en producción, revisar configuraciones de:
+- Variables de entorno (.env)
+- Configuración de CORS
+- Configuración de base de datos
+- Build de producción del frontend
+
+## 📞 Soporte
+
+Para problemas durante la instalación:
+
+1. Verificar que PostgreSQL esté corriendo
+2. Confirmar versiones de PHP y Node.js
+3. Revisar permisos de archivos .sh
+4. Consultar logs en `hoteles-backend/storage/logs/`
