@@ -45,11 +45,20 @@ fi
 
 # 1. Instalar dependencias de Composer
 print_step "Instalando dependencias de Composer..."
-if composer install --no-interaction --optimize-autoloader --no-dev; then
+
+# Instalar dependencias directamente
+print_info "Ejecutando composer install..."
+if composer install --no-interaction --optimize-autoloader; then
     print_success "Dependencias instaladas"
 else
-    print_error "Error instalando dependencias"
-    exit 1
+    print_warning "Error con composer install, intentando sin optimización..."
+    if composer install --no-interaction; then
+        print_success "Dependencias instaladas (sin optimización)"
+    else
+        print_error "Error instalando dependencias con Composer"
+        print_info "Verifica que composer.json esté presente y sea válido"
+        exit 1
+    fi
 fi
 
 # 2. Configurar archivo .env
@@ -264,6 +273,14 @@ fi
 
 if [ -f "routes/api.php" ]; then
     print_success "Rutas de API configuradas"
+    print_info "Endpoints principales disponibles:"
+    echo "    • GET  /api/health (health check)"
+    echo "    • GET  /api/hotels (listar hoteles)"
+    echo "    • GET  /api/hotels/{hotel}/rooms (habitaciones por hotel)"
+    echo "    • POST /api/hotels (crear hotel)"
+    echo "    • POST /api/hotels/{hotel}/rooms (crear habitaciones)"
+    echo "    • PUT  /api/rooms/{habitacion} (actualizar habitación)"
+    echo "    • DELETE /api/rooms/{habitacion} (eliminar habitación)"
 fi
 
 echo ""

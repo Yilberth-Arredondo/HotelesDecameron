@@ -2,7 +2,7 @@
 
 # 🏨 HOTELES DECAMERON - FRONTEND SETUP
 # Script de instalación y configuración del frontend React
-# Autor: Sistema de Gestión Hotelera
+# Creado por: Yilberth-Arredondo
 
 set -e
 

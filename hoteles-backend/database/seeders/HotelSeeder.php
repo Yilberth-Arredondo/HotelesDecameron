@@ -17,35 +17,35 @@ class HotelSeeder extends Seeder
                 'direccion' => 'Calle 23 58-25',
                 'ciudad' => 'Cartagena',
                 'nit' => '12345678-9',
-                'numero_habitaciones' => 42
+                'numero_max_habitaciones' => 42
             ],
             [
                 'nombre' => 'Decameron San Andrés',
                 'direccion' => 'Avenida Colombia No. 1-19',
                 'ciudad' => 'San Andrés',
                 'nit' => '98765432-1',
-                'numero_habitaciones' => 60
+                'numero_max_habitaciones' => 60
             ],
             [
                 'nombre' => 'Decameron Marazul',
                 'direccion' => 'Km 14 Vía San Andrés',
                 'ciudad' => 'San Andrés',
                 'nit' => '11223344-5',
-                'numero_habitaciones' => 35
+                'numero_max_habitaciones' => 35
             ],
             [
                 'nombre' => 'Decameron Barú',
                 'direccion' => 'Playa Blanca, Isla Barú',
                 'ciudad' => 'Cartagena',
                 'nit' => '55667788-9',
-                'numero_habitaciones' => 28
+                'numero_max_habitaciones' => 28
             ],
             [
                 'nombre' => 'Decameron Los Cocos',
                 'direccion' => 'Carrera 3 No. 8-60',
                 'ciudad' => 'Rincón del Mar',
                 'nit' => '99887766-3',
-                'numero_habitaciones' => 50
+                'numero_max_habitaciones' => 50
             ]
         ];
 

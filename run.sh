@@ -38,6 +38,35 @@ print_info "• Backend Laravel (Puerto 8080)"
 print_info "• Frontend React (Puerto 3000)"
 echo ""
 
+# Función para ejecutar verificación previa
+run_precheck() {
+    print_step "Verificación rápida de requisitos..."
+    
+    # Usar verificación rápida si existe, sino la completa
+    if [ -f "quick-check.sh" ]; then
+        chmod +x quick-check.sh 2>/dev/null || true
+        if ./quick-check.sh; then
+            print_success "Verificación completada - sistema listo"
+        else
+            print_error "Faltan requisitos importantes"
+            print_info "Instala los componentes faltantes antes de continuar"
+            exit 1
+        fi
+    elif [ -f "pre-install-check.sh" ]; then
+        chmod +x pre-install-check.sh 2>/dev/null || true
+        print_info "Ejecutando verificación completa..."
+        if timeout 30 ./pre-install-check.sh >/dev/null 2>&1; then
+            print_success "Verificación completada"
+        else
+            print_warning "Verificación tomó demasiado tiempo, continuando..."
+        fi
+    else
+        print_info "No se encontró script de verificación, continuando..."
+    fi
+    
+    echo ""
+}
+
 # Función para verificar comandos requeridos
 check_requirements() {
     print_step "Verificando requisitos del sistema..."
@@ -202,6 +231,14 @@ EOF
         print_info "Ejecutando migraciones..."
         php artisan migrate --force
         
+        # Ejecutar seeders
+        print_info "Ejecutando seeders..."
+        if php artisan db:seed --force; then
+            print_success "Datos iniciales cargados"
+        else
+            print_warning "Error ejecutando seeders (normal si no existen)"
+        fi
+        
         # Limpiar caché
         php artisan config:clear
         php artisan cache:clear
@@ -297,6 +334,7 @@ start_servers() {
     echo ""
     print_info "Test rápido de la API:"
     echo "  curl http://localhost:8080/api/health"
+    echo "  curl http://localhost:8080/api/hotels"
     echo ""
     
     # Preguntar si quiere iniciar automáticamente
@@ -334,6 +372,7 @@ main() {
     fi
     
     # Ejecutar pasos de instalación
+    run_precheck
     check_requirements
     setup_postgresql
     setup_backend
