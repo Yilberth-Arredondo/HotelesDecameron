@@ -46,8 +46,8 @@ echo "📍 Puerto: $PORT"
 echo ""
 echo "📋 Endpoints disponibles:"
 echo "   - $APP_URL/api/health"
-echo "   - $APP_URL/api/hoteles"
-echo "   - $APP_URL/api/hoteles/{id}/habitaciones"
+echo "   - $APP_URL/api/hotels"
+echo "   - $APP_URL/api/hotels/{id}/rooms"
 echo ""
 
 # Opción 1: Usar servidor de Laravel (más simple)

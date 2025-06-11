@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Configuración de axios
 const apiClient = axios.create({
@@ -112,7 +112,7 @@ export const hotelService = {
    */
   async getHabitaciones() {
     try {
-      const response = await apiClient.get('/habitaciones');
+      const response = await apiClient.get('/rooms');
       return response.data;
     } catch (error) {
       console.error('Error al obtener habitaciones:', error);
@@ -125,7 +125,7 @@ export const hotelService = {
    */
   async getHabitacionesByHotel(hotelId) {
     try {
-      const response = await apiClient.get(`/hotels/${hotelId}/habitaciones`);
+      const response = await apiClient.get(`/hotels/${hotelId}/rooms`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener habitaciones del hotel:', error);
@@ -138,7 +138,7 @@ export const hotelService = {
    */
   async getHabitacion(id) {
     try {
-      const response = await apiClient.get(`/habitaciones/${id}`);
+      const response = await apiClient.get(`/rooms/${id}`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener habitación:', error);
@@ -151,7 +151,10 @@ export const hotelService = {
    */
   async createHabitacion(habitacionData) {
     try {
-      const response = await apiClient.post('/habitaciones', habitacionData);
+      const response = await apiClient.post(
+        `/hotels/${habitacionData.hotel_id}/rooms`,
+        habitacionData
+      );
       return response.data;
     } catch (error) {
       console.error('Error al crear habitación:', error);
@@ -164,7 +167,7 @@ export const hotelService = {
    */
   async updateHabitacion(id, habitacionData) {
     try {
-      const response = await apiClient.put(`/habitaciones/${id}`, habitacionData);
+      const response = await apiClient.put(`/rooms/${id}`, habitacionData);
       return response.data;
     } catch (error) {
       console.error('Error al actualizar habitación:', error);
@@ -177,7 +180,7 @@ export const hotelService = {
    */
   async deleteHabitacion(id) {
     try {
-      await apiClient.delete(`/habitaciones/${id}`);
+      await apiClient.delete(`/rooms/${id}`);
       return true;
     } catch (error) {
       console.error('Error al eliminar habitación:', error);

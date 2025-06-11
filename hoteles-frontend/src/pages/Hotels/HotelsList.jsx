@@ -1,19 +1,18 @@
-// src/pages/Hotels/HotelsList.jsx
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   BuildingOfficeIcon,
-  MapPinIcon,
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
   MagnifyingGlassIcon,
+  MapPinIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
-import { hotelService } from '../../services/HotelService';
-import Modal from '../../components/ui/Modal';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Modal from '../../components/ui/Modal';
+import { hotelService } from '../../services/HotelService';
 
 const HotelsList = () => {
   const navigate = useNavigate();
@@ -79,7 +78,7 @@ const HotelsList = () => {
       direccion: hotel.direccion,
       ciudad: hotel.ciudad,
       nit: hotel.nit,
-      numero_habitaciones: hotel.numero_habitaciones,
+      numero_habitaciones: hotel.numero_max_habitaciones,
     });
     setShowModal(true);
   };
@@ -212,7 +211,7 @@ const HotelsList = () => {
                   <div className='flex justify-between items-center pt-2 border-t'>
                     <span className='text-gray-500'>NIT: {hotel.nit}</span>
                     <span className='text-blue-600 font-medium'>
-                      {hotel.numero_habitaciones} hab.
+                      {hotel.numero_max_habitaciones} hab.
                     </span>
                   </div>
                 </div>
@@ -275,9 +274,9 @@ const HotelsList = () => {
             label='Número de Habitaciones'
             type='number'
             min='1'
-            value={formData.numero_habitaciones}
+            value={formData.numero_max_habitaciones}
             onChange={(e) =>
-              setFormData({ ...formData, numero_habitaciones: e.target.value })
+              setFormData({ ...formData, numero_max_habitaciones: e.target.value })
             }
             required
             placeholder='Ej: 42'

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('direccion');
             $table->string('ciudad');
             $table->string('nit', 20)->unique();
-            $table->integer('numero_habitaciones');
+            $table->integer('numero_max_habitaciones');
             $table->timestamps();
         });
     }

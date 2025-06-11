@@ -1,21 +1,20 @@
-// src/pages/Hotels/HotelDetail.jsx
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import {
-  BuildingOfficeIcon,
-  MapPinIcon,
-  IdentificationIcon,
-  HomeIcon,
-  PlusIcon,
-  PencilIcon,
-  TrashIcon,
   ArrowLeftIcon,
+  BuildingOfficeIcon,
+  HomeIcon,
+  IdentificationIcon,
+  MapPinIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
-import { hotelService } from '../../services/HotelService';
-import Modal from '../../components/ui/Modal';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate, useParams } from 'react-router-dom';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Modal from '../../components/ui/Modal';
+import { hotelService } from '../../services/HotelService';
 
 const HotelDetail = () => {
   const { id } = useParams();
@@ -25,6 +24,14 @@ const HotelDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingHabitacion, setEditingHabitacion] = useState(null);
+  const [showHotelModal, setShowHotelModal] = useState(false);
+  const [hotelFormData, setHotelFormData] = useState({
+    nombre: '',
+    direccion: '',
+    ciudad: '',
+    nit: '',
+    numero_max_habitaciones: '',
+  });
   const [formData, setFormData] = useState({
     tipo: 'ESTANDAR',
     acomodacion: 'SENCILLA',
@@ -54,6 +61,7 @@ const HotelDetail = () => {
   };
 
   const handleTipoChange = (tipo) => {
+    console.log('Tipo seleccionado:', tipo);
     const acomodacionesValidas = hotelService.getAcomodacionesByTipo(tipo);
     setFormData({
       ...formData,
@@ -75,7 +83,22 @@ const HotelDetail = () => {
       return;
     }
 
-    // Validar cantidad total de habitaciones
+    // NUEVA VALIDACIÓN: Verificar duplicados tipo+acomodación
+    const existeCombinaciom = habitaciones.find(
+      (hab) =>
+        hab.tipo_habitacion === formData.tipo &&
+        hab.acomodacion === formData.acomodacion &&
+        (!editingHabitacion || hab.id !== editingHabitacion.id)
+    );
+
+    if (existeCombinaciom) {
+      toast.error(
+        `Ya existe una configuración de habitación ${formData.tipo} con acomodación ${formData.acomodacion} en este hotel`
+      );
+      return;
+    }
+
+    // Validar límite total de habitaciones
     const totalActual = habitaciones.reduce(
       (sum, hab) => sum + hab.cantidad,
       0
@@ -84,25 +107,26 @@ const HotelDetail = () => {
       ? totalActual - editingHabitacion.cantidad + parseInt(formData.cantidad)
       : totalActual + parseInt(formData.cantidad);
 
-    if (nuevaCantidad > hotel.numero_habitaciones) {
+    if (nuevaCantidad > hotel.numero_max_habitaciones) {
       toast.error(
-        `La cantidad total de habitaciones (${nuevaCantidad}) excede el máximo del hotel (${hotel.numero_habitaciones})`
+        `La cantidad total de habitaciones (${nuevaCantidad}) excede el máximo permitido para este hotel (${hotel.numero_max_habitaciones})`
       );
       return;
     }
 
     try {
+      const dataToSend = {
+        tipo_habitacion: formData.tipo,
+        acomodacion: formData.acomodacion,
+        cantidad: parseInt(formData.cantidad),
+        hotel_id: parseInt(id),
+      };
+
       if (editingHabitacion) {
-        await hotelService.updateHabitacion(editingHabitacion.id, {
-          ...formData,
-          hotel_id: id,
-        });
+        await hotelService.updateHabitacion(editingHabitacion.id, dataToSend);
         toast.success('Habitación actualizada correctamente');
       } else {
-        await hotelService.createHabitacion({
-          ...formData,
-          hotel_id: id,
-        });
+        await hotelService.createHabitacion(dataToSend);
         toast.success('Habitación creada correctamente');
       }
 
@@ -110,7 +134,13 @@ const HotelDetail = () => {
       resetForm();
       loadHotelData();
     } catch (error) {
-      toast.error('Error al guardar habitación');
+      if (error.response?.data?.errors?.acomodacion) {
+        toast.error(error.response.data.errors.acomodacion[0]);
+      } else if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Error al guardar habitación');
+      }
       console.error(error);
     }
   };
@@ -118,7 +148,7 @@ const HotelDetail = () => {
   const handleEdit = (habitacion) => {
     setEditingHabitacion(habitacion);
     setFormData({
-      tipo: habitacion.tipo,
+      tipo: habitacion.tipo_habitacion,
       acomodacion: habitacion.acomodacion,
       cantidad: habitacion.cantidad,
     });
@@ -149,6 +179,31 @@ const HotelDetail = () => {
 
   const getTotalHabitaciones = () => {
     return habitaciones.reduce((sum, hab) => sum + hab.cantidad, 0);
+  };
+
+  const handleEditHotel = async () => {
+    setShowHotelModal(true);
+    setHotelFormData({
+      nombre: hotel.nombre,
+      direccion: hotel.direccion,
+      ciudad: hotel.ciudad,
+      nit: hotel.nit,
+      numero_max_habitaciones: hotel.numero_max_habitaciones,
+    });
+  };
+
+  const handleSubmitHotel = async (e) => {
+    e.preventDefault();
+
+    try {
+      await hotelService.updateHotel(id, hotelFormData);
+      toast.success('Hotel actualizado correctamente');
+      setShowHotelModal(false);
+      loadHotelData();
+    } catch (error) {
+      toast.error('Error al actualizar hotel');
+      console.error(error);
+    }
   };
 
   if (loading) {
@@ -184,12 +239,23 @@ const HotelDetail = () => {
               <ArrowLeftIcon className='h-5 w-5 mr-1' />
               Volver a hoteles
             </button>
-            <h1 className='text-3xl font-bold text-gray-900'>{hotel.nombre}</h1>
+            <div className='flex items-center gap-4'>
+              <h1 className='text-3xl font-bold text-gray-900'>
+                {hotel.nombre}
+              </h1>
+              <Button
+                variant='secondary'
+                size='sm'
+                onClick={handleEditHotel}>
+                <PencilIcon className='h-4 w-4 mr-1' />
+                Editar
+              </Button>
+            </div>
           </div>
           <div className='text-right'>
             <p className='text-sm text-gray-500'>Capacidad total</p>
             <p className='text-2xl font-bold text-blue-600'>
-              {getTotalHabitaciones()} / {hotel.numero_habitaciones}
+              {getTotalHabitaciones()} / {hotel.numero_max_habitaciones}
             </p>
             <p className='text-sm text-gray-500'>habitaciones</p>
           </div>
@@ -229,7 +295,7 @@ const HotelDetail = () => {
               resetForm();
               setShowModal(true);
             }}
-            disabled={getTotalHabitaciones() >= hotel.numero_habitaciones}>
+            disabled={getTotalHabitaciones() >= hotel.numero_max_habitaciones}>
             <PlusIcon className='h-5 w-5 mr-2' />
             Agregar Habitación
           </Button>
@@ -271,7 +337,7 @@ const HotelDetail = () => {
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800'>
-                        {habitacion.tipo}
+                        {habitacion.tipo_habitacion}
                       </span>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
@@ -377,6 +443,107 @@ const HotelDetail = () => {
             <Button type='submit'>
               {editingHabitacion ? 'Actualizar' : 'Agregar'}
             </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Modal para editar hotel */}
+      <Modal
+        isOpen={showHotelModal}
+        onClose={() => setShowHotelModal(false)}
+        title='Editar Hotel'>
+        <form
+          onSubmit={handleSubmitHotel}
+          className='space-y-4'>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              Nombre
+            </label>
+            <input
+              type='text'
+              value={hotelFormData.nombre}
+              onChange={(e) =>
+                setHotelFormData({ ...hotelFormData, nombre: e.target.value })
+              }
+              className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+              required
+            />
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              Dirección
+            </label>
+            <input
+              type='text'
+              value={hotelFormData.direccion}
+              onChange={(e) =>
+                setHotelFormData({
+                  ...hotelFormData,
+                  direccion: e.target.value,
+                })
+              }
+              className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+              required
+            />
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              Ciudad
+            </label>
+            <input
+              type='text'
+              value={hotelFormData.ciudad}
+              onChange={(e) =>
+                setHotelFormData({ ...hotelFormData, ciudad: e.target.value })
+              }
+              className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+              required
+            />
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              NIT
+            </label>
+            <input
+              type='text'
+              value={hotelFormData.nit}
+              onChange={(e) =>
+                setHotelFormData({ ...hotelFormData, nit: e.target.value })
+              }
+              className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+              required
+            />
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              Número máximo de habitaciones
+            </label>
+            <input
+              type='number'
+              value={hotelFormData.numero_max_habitaciones}
+              onChange={(e) =>
+                setHotelFormData({
+                  ...hotelFormData,
+                  numero_max_habitaciones: parseInt(e.target.value) || 0,
+                })
+              }
+              className='w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+              required
+            />
+          </div>
+
+          <div className='flex justify-end space-x-3 pt-4'>
+            <Button
+              type='button'
+              variant='secondary'
+              onClick={() => setShowHotelModal(false)}>
+              Cancelar
+            </Button>
+            <Button type='submit'>Actualizar</Button>
           </div>
         </form>
       </Modal>

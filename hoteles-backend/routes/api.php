@@ -30,10 +30,10 @@ Route::get('/health', function () {
 });
 
 // Rutas para hoteles
-Route::apiResource('hoteles', HotelController::class);
+Route::apiResource('hotels', HotelController::class);
 
 // Rutas para habitaciones
-Route::apiResource('hoteles.habitaciones', HabitacionController::class)->shallow();
+Route::apiResource('hotels.rooms', HabitacionController::class, ['parameters' => ['rooms' => 'habitacion']])->shallow();
 
 // Ruta adicional de información
 Route::get('/', function () {
@@ -41,8 +41,8 @@ Route::get('/', function () {
         'message' => 'API de Hoteles Decameron',
         'version' => '1.0',
         'endpoints' => [
-            'hoteles' => '/api/hoteles',
-            'habitaciones' => '/api/hoteles/{hotel}/habitaciones',
+            'hotels' => '/api/hotels',
+            'rooms' => '/api/hotels/{hotel}/rooms',
             'health' => '/api/health'
         ]
     ]);

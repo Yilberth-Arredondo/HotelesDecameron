@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import {
   BuildingOfficeIcon,
-  HomeIcon,
   ChartBarIcon,
-  UsersIcon,
+  HomeIcon,
 } from '@heroicons/react/24/outline';
-import { hotelService } from '../services/HotelService';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+import { hotelService } from '../services/HotelService';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -23,26 +22,48 @@ const Dashboard = () => {
 
   const loadStats = async () => {
     try {
-      const response = await hotelService.getAll();
+      const response = await hotelService.getHoteles();
 
       if (response.success && response.data) {
         const hoteles = response.data;
         const totalHoteles = hoteles.length;
-        const totalHabitaciones = hoteles.reduce(
-          (sum, hotel) => sum + (hotel.total_habitaciones_configuradas || 0),
-          0
-        );
-        const capacidadTotal = hoteles.reduce(
-          (sum, hotel) => sum + (hotel.numero_max_habitaciones || 0),
-          0
-        );
+
+        // Calcular habitaciones configuradas correctamente
+        let totalHabitacionesConfiguradas = 0;
+        let capacidadTotal = 0;
+
+        for (const hotel of hoteles) {
+          try {
+            const habitacionesResponse =
+              await hotelService.getHabitacionesByHotel(hotel.id);
+            if (habitacionesResponse.success && habitacionesResponse.data) {
+              // Sumar la cantidad de todas las habitaciones configuradas
+              const habitacionesHotel = habitacionesResponse.data.reduce(
+                (sum, habitacion) => sum + habitacion.cantidad,
+                0
+              );
+              totalHabitacionesConfiguradas += habitacionesHotel;
+            }
+          } catch (error) {
+            console.warn(
+              `Error al cargar habitaciones del hotel ${hotel.id}:`,
+              error
+            );
+          }
+
+          // Sumar la capacidad máxima del hotel
+          capacidadTotal += hotel.numero_max_habitaciones || 0;
+        }
+
         const ocupacion =
-          capacidadTotal > 0 ? (totalHabitaciones / capacidadTotal) * 100 : 0;
+          capacidadTotal > 0
+            ? (totalHabitacionesConfiguradas / capacidadTotal) * 100
+            : 0;
 
         setStats({
           totalHoteles,
-          totalHabitaciones,
-          ocupacion: Math.round(ocupacion),
+          totalHabitaciones: totalHabitacionesConfiguradas,
+          ocupacion: Math.round(ocupacion * 10) / 10, // Redondear a 1 decimal
           loading: false,
         });
       }
