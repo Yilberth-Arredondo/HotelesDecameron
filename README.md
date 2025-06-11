@@ -28,12 +28,30 @@ Sistema de gestión hotelera desarrollado con arquitectura desacoplada, permitie
 
 ## ⚡ Instalación Rápida
 
-### Instalación Automática (Recomendada)
+### 👀 Consideraciones iniciales
+- El despliegue local está pensado para trabajar correctamente con bash de unix SO Ubuntu22.04, los comandos para la CLI de windows pueden ser diferentes
+- Si tiene un Sistema windows se recomienda el uso de wsl para el correcto despliegue del proyecto
 
+### Instalación Automática (Recomendada)
 ```bash
 # Clonar el repositorio
 git clone git@github.com:Yilberth-Arredondo/HotelesDecameron.git
 cd HotelesDecameron
+```
+- Se recomienda el uso de los siguiente comandos para iniciar el servicio correctamente
+```bash
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+sudo chmod +x /usr/local/bin/composer
+sudo apt install -y php8.4-xml php8.4-curl php8.4-mbstring php8.4-zip php8.4-gd php8.4-bcmath php8.4-intl php8.4-pgsql
+chmod +x quick-check.sh
+chmod +x install-requirements.sh
+chmod +x run.sh
+
+#instalando todo lo necesario
+./install-requirements.sh
+#haciendo checkeo de dependencias
+./quick-check.sh
 
 # Ejecutar instalación automática
 chmod +x run.sh
@@ -52,7 +70,7 @@ El script `run.sh` ejecutará automáticamente:
 
 Una vez completada la instalación:
 
-- **Frontend**: http://localhost:3000
+- **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8080/api
 - **Health Check**: http://localhost:8080/api/health
 
@@ -290,7 +308,7 @@ curl -X POST http://localhost:8080/api/hotels/1/habitaciones \
 
 ### Verificar Frontend
 
-- Navegar a http://localhost:3000
+- Navegar a http://localhost:5173
 - Verificar carga de hoteles
 - Probar navegación entre secciones
 
@@ -393,7 +411,7 @@ src/
 - **Backend**: Utiliza validaciones a nivel de modelo y request
 - **Frontend**: Considera implementar custom hooks para gestión de estado en proyectos más grandes
 - **Base de Datos**: Incluye constraints y triggers para integridad de datos
-- **CORS**: Configurado para desarrollo local (localhost:3000)
+- **CORS**: Configurado para desarrollo local (localhost:5173)
 
 ## 🚀 Despliegue
 
